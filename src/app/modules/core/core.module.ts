@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UserService } from './user.service';
+//import { UserService } from './user.service';
 import { UserLoginService } from './user-login.service';
+import { UserRegistrationService } from './user-registration.service';
 import { CognitoUtil } from './cognito.service';
 @NgModule({
   imports: [
@@ -9,8 +10,9 @@ import { CognitoUtil } from './cognito.service';
   ],
   declarations: [],
   providers: [
-    UserService,
+  //  UserService,
     UserLoginService,
+    UserRegistrationService,
     CognitoUtil
 ]
 })

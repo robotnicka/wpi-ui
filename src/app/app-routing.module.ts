@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { UserService } from 'app/modules/core/user.service';
+import { UserLoginService } from 'app/modules/core/user-login.service';
 const routes: Routes = [
 	{ path: '', loadChildren: 'app/modules/home/home.module#HomeModule' },
-	{ path: 'login', loadChildren: 'app/modules/login/login.module#LoginModule'},
-	{ path: 'user', loadChildren: 'app/modules/user/user.module#UserModule', canActivate: [UserService]},
+	{ path: 'auth', loadChildren: 'app/modules/auth/auth.module#AuthModule'},
+	{ path: 'user', loadChildren: 'app/modules/user/user.module#UserModule', canActivate: [UserLoginService]},
 	//{ path: 'user', loadChildren: 'app/modules/user/user.module#UserModule',},
 ];
 

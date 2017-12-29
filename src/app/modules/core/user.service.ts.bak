@@ -1,18 +1,16 @@
 import { Injectable } from '@angular/core';
-import { CanActivate } from '@angular/router';
-import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
 @Injectable()
-export class UserService implements CanActivate {
+export class UserService {
 	userProfile: any;
 	loggedIn: boolean;
 	loggedIn$ = new BehaviorSubject<boolean>(this.loggedIn);
 	expiresAt: number;
-	constructor(private router: Router) {
+	constructor() {
 		const lsProfile = localStorage.getItem('profile');
 		this.expiresAt = JSON.parse(localStorage.getItem('expires_at'));
 		if(this.tokenValid) {
@@ -50,29 +48,11 @@ export class UserService implements CanActivate {
 		this.userProfile = undefined;
 		this.setLoggedIn(false);
 		// Return to homepage
-		this.router.navigate(['/']);
+		//this.router.navigate(['/']);
 	}
 	get tokenValid(): boolean {
 		// Check if current time is past access token's expiration
 		return Date.now() < this.expiresAt;
-	}
-	canActivate() {
-		return this.loggedIn$.asObservable().map(
-			(loggedIn:boolean)=>{
-				console.log('map called!');
-				if(loggedIn){
-					console.log('returning true!');
-					return true;
-				}
-				else {
-					console.log('navigating to login!');
-					this.router.navigate(['/login']);
-					console.log('returning false!');
-					return false;
-				}
-			}
-		);
-			
 	}
 
 }

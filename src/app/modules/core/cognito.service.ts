@@ -1,7 +1,10 @@
 import {Injectable} from "@angular/core";
 import {environment} from "../../../environments/environment";
 import {Subject} from 'rxjs/Subject';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/first';
+
 import {
 	AuthenticationDetails,
 	CognitoIdentityServiceProvider,
@@ -12,11 +15,6 @@ import {
 import * as AWS from "aws-sdk/global";
 import * as awsservice from "aws-sdk/lib/service";
 import * as CognitoIdentity from "aws-sdk/clients/cognitoidentity";
-
-
-interface CallbackFunction {
-	(error: any, result: any): void;
-}
 
 export class CognitoResponse{
 	public message: string;
@@ -36,8 +34,8 @@ export class LoginResponse{
 		this.loggedIn = loggedIn;
 	}
 }
-
-function subToHandler<T>(subject: Subject<T>, successFn: (m:any) => T, errorFn?: (a:any) => any): CallbackFunction {
+/*
+function subToHandler<T>(subject: ReplaySubject<T>, successFn: (m:any) => T, errorFn?: (a:any) => any): CallbackFunction {
 	return (error:any, result:any) => {
 		if (!!error) {
 			if (!!errorFn) {
@@ -52,10 +50,10 @@ function subToHandler<T>(subject: Subject<T>, successFn: (m:any) => T, errorFn?:
 		}
 	};
 }
-
+*/
 
 @Injectable()
-export class CognitoUtil {
+export class CognitoUtil{
 
 	public static _REGION = environment.cognito.region;
 
@@ -69,6 +67,8 @@ export class CognitoUtil {
 	};
 
 	public cognitoCreds: AWS.CognitoIdentityCredentials;
+
+
 
 	getUserPool() {
 		if (environment.cognito.idp_endpoint) {
@@ -124,7 +124,7 @@ export class CognitoUtil {
 	}
 
 	getAccessToken(): Observable<string> {
-		let accessTokenResult = new Subject<string>();
+		let accessTokenResult = new ReplaySubject<string>();
 		if (this.getCurrentUser() != null)
 			this.getCurrentUser().getSession(function (err, session) {
 				if (err) {
@@ -140,11 +140,11 @@ export class CognitoUtil {
 			});
 		else
 			accessTokenResult.next(null);
-		return accessTokenResult.asObservable();
+		return accessTokenResult.asObservable().first();
 	}
 
 	getIdToken(): Observable<string> {
-		let idTokenResult = new Subject<string>();
+		let idTokenResult = new ReplaySubject<string>();
 		if (this.getCurrentUser() != null)
 			this.getCurrentUser().getSession(function (err, session) {
 				if (err) {
@@ -162,11 +162,11 @@ export class CognitoUtil {
 			});
 		else
 			idTokenResult.next(null);
-		return idTokenResult.asObservable();
+		return idTokenResult.asObservable().first();
 	}
 
 	getRefreshToken(): Observable<string> {
-		let refreshTokenResult = new Subject<string>();
+		let refreshTokenResult = new ReplaySubject<string>();
 		if (this.getCurrentUser() != null)
 			this.getCurrentUser().getSession(function (err, session) {
 				if (err) {
@@ -182,7 +182,7 @@ export class CognitoUtil {
 			});
 		else
 			refreshTokenResult.next(null);
-		return refreshTokenResult.asObservable();
+		return refreshTokenResult.asObservable().first();
 	}
 
 	refresh(): void {
@@ -200,4 +200,5 @@ export class CognitoUtil {
 			}
 		});
 	}
+	
 }

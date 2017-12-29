@@ -1,20 +1,53 @@
 import {environment} from "../../../environments/environment";
 import {Injectable} from "@angular/core";
 import {Subject} from 'rxjs/Subject';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/of';
 import {CognitoUtil, CognitoResponse, LoginResponse} from "./cognito.service";
+import {CognitoPasswordChallenge, UserRegistrationService} from './user-registration.service';
 import {AuthenticationDetails, CognitoUser} from "amazon-cognito-identity-js";
 import * as AWS from "aws-sdk/global";
 import * as STS from "aws-sdk/clients/sts";
-
+import { CanActivate, Router } from '@angular/router';
 @Injectable()
-export class UserLoginService {
-
-	constructor(public cognitoUtil: CognitoUtil) {
+export class UserLoginService implements CanActivate {
+	private $loggedIn: BehaviorSubject<LoginResponse>;
+	constructor(public cognitoUtil: CognitoUtil, private register: UserRegistrationService, private router: Router) {
+	}
+	
+	canActivate(): Observable<boolean> {
+		return this.isAuthenticated().first().map(
+			(response:LoginResponse)=>{
+				console.log('map called!');
+				console.log('loggedIn?',response.loggedIn);
+				if(response.loggedIn){
+					console.log('returning true!');
+					return true;
+				}
+				else {
+					console.log('navigating to login!');
+					this.router.navigate(['/auth/login']);
+					console.log('returning false!');
+					return false;
+				}
+			}
+		).catch(
+			(err: any, caught: Observable<boolean>) => {
+				console.log('received error!');
+				this.router.navigate(['/auth/login']);
+				return Observable.of(false);
+			}
+		);
+			
 	}
 
 	authenticate(username: string, password: string) {
-		let authenticateResult = new Subject<CognitoResponse>();
+		let authenticateResult = new ReplaySubject<CognitoResponse>();
 		console.log("UserLoginService: starting the authentication")
 
 		let authenticationData = {
@@ -34,6 +67,7 @@ export class UserLoginService {
 		var self = this;
 		cognitoUser.authenticateUser(authenticationDetails, {
 			newPasswordRequired: function (userAttributes, requiredAttributes) {
+				self.register.setAuthChallenge(new CognitoPasswordChallenge(userAttributes, requiredAttributes));
 				authenticateResult.next(new CognitoResponse(`User needs to set password.`, null));
 			},
 			onSuccess: function (result) {
@@ -59,6 +93,7 @@ export class UserLoginService {
 				sts.getCallerIdentity(function (err, data) {
 					console.log("UserLoginService: Successfully set the AWS credentials");
 					authenticateResult.next(new CognitoResponse(null, result));
+					self.$loggedIn.next(new LoginResponse("User logged in", true));
 				});
 
 			},
@@ -66,11 +101,11 @@ export class UserLoginService {
 				authenticateResult.next(new CognitoResponse(err.message, null));
 			},
 		});
-		return authenticateResult.asObservable(); 
+		return authenticateResult.asObservable().first(); 
 	}
 
 	forgotPassword(username: string) {
-		let forgotResult = new Subject<CognitoResponse>();
+		let forgotResult = new ReplaySubject<CognitoResponse>();
 		let userData = {
 			Username: username,
 			Pool: this.cognitoUtil.getUserPool()
@@ -89,11 +124,11 @@ export class UserLoginService {
 				forgotResult.next(new CognitoResponse(null, null));
 			}
 		});
-		return forgotResult.asObservable();
+		return forgotResult.asObservable().first();
 	}
 
 	confirmNewPassword(email: string, verificationCode: string, password: string) {
-		let confirmResult = new Subject<CognitoResponse>();
+		let confirmResult = new ReplaySubject<CognitoResponse>();
 		let userData = {
 			Username: email,
 			Pool: this.cognitoUtil.getUserPool()
@@ -109,35 +144,40 @@ export class UserLoginService {
 				confirmResult.next(new CognitoResponse(err.message, null));
 			}
 		});
-		return confirmResult.asObservable();
+		return confirmResult.asObservable().first();
 	}
 
 	logout() {
 		console.log("UserLoginService: Logging out");
 		this.cognitoUtil.getCurrentUser().signOut();
+		this.$loggedIn.next(new LoginResponse("User logged out", false));
 
 	}
 
 	isAuthenticated() {
-		let authenticatedResult = new Subject<LoginResponse>();
-		let cognitoUser = this.cognitoUtil.getCurrentUser();
-
-		if (cognitoUser != null) {
-			cognitoUser.getSession(function (err, session) {
-				if (err) {
-					console.log("UserLoginService: Couldn't get the session: " + err, err.stack);
-					authenticatedResult.next(new LoginResponse(err, false));
-				}
-				else {
-					console.log("UserLoginService: Session is " + session.isValid());
-					authenticatedResult.next(new LoginResponse(err, session.isValid()));
-				}
-			});
-		} else {
-			console.log("UserLoginService: can't retrieve the current user");
-			authenticatedResult.next(new LoginResponse("Can't retrieve the CurrentUser", false));
+		if(this.$loggedIn == null){
+			this.$loggedIn = new BehaviorSubject<LoginResponse>(null);
+			let cognitoUser = this.cognitoUtil.getCurrentUser();
+	
+			if (cognitoUser != null) {
+				var self = this;
+				cognitoUser.getSession(function (err, session) {
+					if (err) {
+						console.log("UserLoginService: Couldn't get the session: " + err, err.stack);
+						self.$loggedIn.next(new LoginResponse(err, false));
+					}
+					else {
+						console.log("UserLoginService: Session is " + session.isValid());
+						self.$loggedIn.next(new LoginResponse(err, session.isValid()));
+					}
+				});
+			} else {
+				console.log("UserLoginService: can't retrieve the current user");
+				this.$loggedIn.next(new LoginResponse("Can't retrieve the CurrentUser", false));
+			}
 		}
-		return authenticatedResult.asObservable();
+		console.log('returning observable');
+		return this.$loggedIn.asObservable();
 	}
 
 }
