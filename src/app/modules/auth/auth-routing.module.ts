@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { AuthComponent } from './components/auth/auth.component';
 import { LoginComponent } from './components/login/login.component';
 import { PasswordComponent } from './components/password/password.component';
+import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
 	imports: [
@@ -13,7 +14,8 @@ import { PasswordComponent } from './components/password/password.component';
 				children: [
 					{ path: '', redirectTo: 'login', pathMatch: 'full' },
 					{ path: 'login', component: LoginComponent },
-					{ path: 'password', component: PasswordComponent }
+					{ path: 'password', component: PasswordComponent },
+					{ path: 'register', component: RegisterComponent }
 				]
 			}
 		])

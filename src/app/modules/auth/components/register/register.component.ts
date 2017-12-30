@@ -4,8 +4,21 @@ import {UserRegistrationService} from "app/modules/core/user-registration.servic
 
 export class RegistrationUser {
     name: string;
+    username: string;
     email: string;
     password: string;
+    addressInfo: RegistrationAddressInfo;
+    address: string;
+    birthdate: string;
+}
+
+export class RegistrationAddressInfo {
+	street_address: string;
+	locality: string;
+	region: string;
+	postal_code: string;
+	country: string;
+	
 }
 /**
  * This component is responsible for displaying and controlling
@@ -23,6 +36,7 @@ export class RegisterComponent implements OnInit {
     constructor(public userRegistration: UserRegistrationService, router: Router) {
         this.router = router;
         this.registrationUser = new RegistrationUser();
+        this.registrationUser.addressInfo = new RegistrationAddressInfo();
         this.errorMessage = null;
     }
     
@@ -32,7 +46,7 @@ export class RegisterComponent implements OnInit {
 
     onRegister() {
         this.errorMessage = null;
-        //this.userRegistration.register(this.registrationUser, this);
+        this.userRegistration.register(this.registrationUser);
     }
 
     cognitoCallback(message: string, result: any) {

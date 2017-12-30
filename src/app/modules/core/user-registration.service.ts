@@ -24,34 +24,30 @@ export class UserRegistrationService {
 	constructor(@Inject(CognitoUtil) public cognitoUtil: CognitoUtil) {
 
 	}
-/*
+
 	register(user:RegistrationUser): void {
+		let registerResult = new ReplaySubject<CognitoResponse>();
 		console.log("UserRegistrationService: user is " + user);
 
 		let attributeList = [];
+		user.address = JSON.stringify(user.addressInfo);
+		let attributeNames = ['email', 'name','address', 'birthdate'];
+		for(let i = 0; i < attributeNames.length; i++){
+			attributeList.push(new CognitoUserAttribute({Name: attributeNames[i], Value: user[attributeNames[i]]})); 
+		}
+		console.log(attributeList);
 
-		let dataEmail = {
-			Name: 'email',
-			Value: user.email
-		};
-		let dataNickname = {
-			Name: 'nickname',
-			Value: user.name
-		};
-		attributeList.push(new CognitoUserAttribute(dataEmail));
-		attributeList.push(new CognitoUserAttribute(dataNickname));
-
-		this.cognitoUtil.getUserPool().signUp(user.email, user.password, attributeList, null, function (err, result) {
+		this.cognitoUtil.getUserPool().signUp(user.username, user.password, attributeList, null, function (err, result) {
 			if (err) {
-				callback.cognitoCallback(err.message, null);
+				registerResult.next(new CognitoResponse(err.message, null));
 			} else {
 				console.log("UserRegistrationService: registered user is " + result);
-				callback.cognitoCallback(null, result);
+				registerResult.next(new CognitoResponse(null, result));
 			}
 		});
 
 	}
-*/
+
 /*
 	confirmRegistration(username: string, confirmationCode: string, callback: CognitoCallback): void {
 
