@@ -1,7 +1,6 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, Inject} from "@angular/core";
 import {Router} from "@angular/router";
-import {UserLoginService} from "app/modules/core/user-login.service";
-import {CognitoResponse, LoginResponse} from "app/modules/core/cognito.service";
+import {CognitoUtil, CognitoResponse, LoginResponse} from "app/modules/core/cognito.service";
 
 @Component({
   selector: 'app-login',
@@ -13,14 +12,13 @@ export class LoginComponent implements OnInit {
     password: string;
     errorMessage: string;
 	loggedIn: boolean = false;
-    constructor(public router: Router,
-                public userService: UserLoginService) {
+    constructor(public router: Router, @Inject('cognitoMain') private cognitoMain: CognitoUtil){
         console.log("LoginComponent constructor");
     }
 
     ngOnInit() {
         this.errorMessage = null;
-        this.userService.isAuthenticated().subscribe(
+        this.cognitoMain.isAuthenticated().subscribe(
         	(response:LoginResponse)=>{
 				console.log('login page init');
 				console.log('loggedIn?',response.loggedIn);
@@ -40,7 +38,7 @@ export class LoginComponent implements OnInit {
             return;
         }
         this.errorMessage = null;
-        this.userService.authenticate(this.email, this.password).subscribe(
+        this.cognitoMain.authenticate(this.email, this.password).subscribe(
         	(response: CognitoResponse) => {
 				if (response.message != null) { //error
 					this.errorMessage = response.message;

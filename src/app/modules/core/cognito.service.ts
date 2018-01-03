@@ -1,20 +1,25 @@
 import {Injectable} from "@angular/core";
 import {environment} from "../../../environments/environment";
 import {Subject} from 'rxjs/Subject';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/of';
+
+import {RegistrationUser, RegistrationAddressInfo} from "app/modules/auth/components/register/register.component";
 
 import {
 	AuthenticationDetails,
 	CognitoIdentityServiceProvider,
 	CognitoUser,
 	CognitoUserAttribute,
-	CognitoUserPool
+	CognitoUserPool,
+	CognitoUserSession
 } from "amazon-cognito-identity-js";
-import * as AWS from "aws-sdk/global";
-import * as awsservice from "aws-sdk/lib/service";
-import * as CognitoIdentity from "aws-sdk/clients/cognitoidentity";
+import { CanActivate, Router } from '@angular/router';
 
 export class CognitoResponse{
 	public message: string;
@@ -34,26 +39,25 @@ export class LoginResponse{
 		this.loggedIn = loggedIn;
 	}
 }
-/*
-function subToHandler<T>(subject: ReplaySubject<T>, successFn: (m:any) => T, errorFn?: (a:any) => any): CallbackFunction {
-	return (error:any, result:any) => {
-		if (!!error) {
-			if (!!errorFn) {
-				subject.error(errorFn(error));
-			}
-			else {
-				subject.error(error);
-			}
-		}
-		else {
-			subject.next(successFn(result));
-		}
-	};
+
+export class CognitoPasswordChallenge{
+	public userAttributes: any;
+	public requiredAttributes: any;
+	constructor(userAttributes: any, requiredAttributes: any){
+		this.userAttributes = userAttributes;
+		this.requiredAttributes = requiredAttributes;
+	}
+	
 }
-*/
+
+export class NewPasswordUser {
+	username: string;
+	existingPassword: string;
+	password: string;
+}
 
 @Injectable()
-export class CognitoUtil{
+export class CognitoUtil {
 
 	public static _REGION = environment.cognito.region;
 
@@ -65,11 +69,126 @@ export class CognitoUtil{
 		UserPoolId: CognitoUtil._USER_POOL_ID,
 		ClientId: CognitoUtil._CLIENT_ID
 	};
+	
+	public challenge: CognitoPasswordChallenge = null;
+	public registeredUser: CognitoUser = null;
 
-	public cognitoCreds: AWS.CognitoIdentityCredentials;
+	private $loggedIn: BehaviorSubject<LoginResponse>;
+	constructor(private router: Router) {}
+	
+	authenticate(username: string, password: string) {
+		let authenticateResult = new ReplaySubject<CognitoResponse>();
+		console.log("UserLoginService: starting the authentication")
 
+		let authenticationData = {
+			Username: username,
+			Password: password,
+		};
+		let authenticationDetails = new AuthenticationDetails(authenticationData);
 
+		let userData = {
+			Username: username,
+			Pool: this.getUserPool()
+		};
 
+		console.log("UserLoginService: Params set...Authenticating the user");
+		let cognitoUser = new CognitoUser(userData);
+		//console.log("UserLoginService: config is " + AWS.config);
+		//var self = this;
+		cognitoUser.authenticateUser(authenticationDetails, {
+			newPasswordRequired: (userAttributes, requiredAttributes) => {
+				this.setAuthChallenge(new CognitoPasswordChallenge(userAttributes, requiredAttributes));
+				authenticateResult.next(new CognitoResponse(`User needs to set password.`, null));
+			},
+			onSuccess: (result: CognitoUserSession, userConfirmationNecessary: boolean) => {
+
+				console.log("In authenticateUser onSuccess callback");
+				console.log("UserLoginService: Successfully logged in");
+				authenticateResult.next(new CognitoResponse(null, result));
+				this.$loggedIn.next(new LoginResponse("User logged in", true));
+			},
+			onFailure: function (err) {
+				authenticateResult.next(new CognitoResponse(err.message, null));
+			},
+		});
+		return authenticateResult.asObservable().first(); 
+	}
+
+	forgotPassword(username: string) {
+		let forgotResult = new ReplaySubject<CognitoResponse>();
+		let userData = {
+			Username: username,
+			Pool: this.getUserPool()
+		};
+
+		let cognitoUser = new CognitoUser(userData);
+
+		cognitoUser.forgotPassword({
+			onSuccess: function () {
+
+			},
+			onFailure: function (err) {
+				forgotResult.next(new CognitoResponse(err.message, null));
+			},
+			inputVerificationCode() {
+				forgotResult.next(new CognitoResponse(null, null));
+			}
+		});
+		return forgotResult.asObservable().first();
+	}
+
+	confirmNewPassword(email: string, verificationCode: string, password: string) {
+		let confirmResult = new ReplaySubject<CognitoResponse>();
+		let userData = {
+			Username: email,
+			Pool: this.getUserPool()
+		};
+
+		let cognitoUser = new CognitoUser(userData);
+
+		cognitoUser.confirmPassword(verificationCode, password, {
+			onSuccess: function () {
+				confirmResult.next(new CognitoResponse(null, null));
+			},
+			onFailure: function (err) {
+				confirmResult.next(new CognitoResponse(err.message, null));
+			}
+		});
+		return confirmResult.asObservable().first();
+	}
+
+	logout() {
+		console.log("UserLoginService: Logging out");
+		this.getCurrentUser().signOut();
+		this.$loggedIn.next(new LoginResponse("User logged out", false));
+
+	}
+
+	isAuthenticated() {
+		if(this.$loggedIn == null){
+			this.$loggedIn = new BehaviorSubject<LoginResponse>(null);
+			let cognitoUser = this.getCurrentUser();
+	
+			if (cognitoUser != null) {
+				var self = this;
+				cognitoUser.getSession(function (err, session) {
+					if (err) {
+						console.log("UserLoginService: Couldn't get the session: " + err, err.stack);
+						self.$loggedIn.next(new LoginResponse(err, false));
+					}
+					else {
+						console.log("UserLoginService: Session is " + session.isValid());
+						self.$loggedIn.next(new LoginResponse(err, session.isValid()));
+					}
+				});
+			} else {
+				console.log("UserLoginService: can't retrieve the current user");
+				this.$loggedIn.next(new LoginResponse("Can't retrieve the CurrentUser", false));
+			}
+		}
+		console.log('returning observable');
+		return this.$loggedIn.asObservable();
+	}
 	getUserPool() {
 		if (environment.cognito.idp_endpoint) {
 			CognitoUtil._POOL_DATA.endpoint = environment.cognito.idp_endpoint;
@@ -79,48 +198,6 @@ export class CognitoUtil{
 
 	getCurrentUser() {
 		return this.getUserPool().getCurrentUser();
-	}
-
-	// AWS Stores Credentials in many ways, and with TypeScript this means that 
-	// getting the base credentials we authenticated with from the AWS globals gets really murky,
-	// having to get around both class extension and unions. Therefore, we're going to give
-	// developers direct access to the raw, unadulterated CognitoIdentityCredentials
-	// object at all times.
-	setCognitoCreds(creds: AWS.CognitoIdentityCredentials) {
-		this.cognitoCreds = creds;
-	}
-
-	getCognitoCreds() {
-		return this.cognitoCreds;
-	}
-
-	// This method takes in a raw jwtToken and uses the global AWS config options to build a
-	// CognitoIdentityCredentials object and store it for us. It also returns the object to the caller
-	// to avoid unnecessary calls to setCognitoCreds.
-
-	buildCognitoCreds(idTokenJwt: string) {
-		let url = 'cognito-idp.' + CognitoUtil._REGION.toLowerCase() + '.amazonaws.com/' + CognitoUtil._USER_POOL_ID;
-		if (environment.cognito.idp_endpoint) {
-			url = environment.cognito.idp_endpoint + '/' + CognitoUtil._USER_POOL_ID;
-		}
-		let logins: CognitoIdentity.LoginsMap = {};
-		logins[url] = idTokenJwt;
-		let params = {
-			IdentityPoolId: CognitoUtil._IDENTITY_POOL_ID, /* required */
-			Logins: logins
-		};
-		let serviceConfigs : awsservice.ServiceConfigurationOptions = {};
-		if (environment.cognito.identity_endpoint) {
-			serviceConfigs.endpoint = environment.cognito.identity_endpoint;
-		}
-		let creds = new AWS.CognitoIdentityCredentials(params, serviceConfigs);
-		this.setCognitoCreds(creds);
-		return creds;
-	}
-
-
-	getCognitoIdentity(): string {
-		return this.cognitoCreds.identityId;
 	}
 
 	getAccessToken(): Observable<string> {
@@ -201,4 +278,116 @@ export class CognitoUtil{
 		});
 	}
 	
+	register(user:RegistrationUser): Observable<CognitoResponse> {
+		let registerResult = new ReplaySubject<CognitoResponse>();
+		console.log("UserRegistrationService: user is " + user);
+
+		let attributeList = [];
+		user.address = JSON.stringify(user.addressInfo);
+		let attributeNames = ['email', 'name','address', 'birthdate'];
+		for(let i = 0; i < attributeNames.length; i++){
+			attributeList.push(new CognitoUserAttribute({Name: attributeNames[i], Value: user[attributeNames[i]]})); 
+		}
+		console.log(attributeList);
+
+		this.getUserPool().signUp(user.username, user.password, attributeList, null, function (err, result) {
+			if (err) {
+				registerResult.next(new CognitoResponse(err.message, null));
+			} else {
+				console.log("UserRegistrationService: registered user is " + result);
+				this.registeredUser = result.user;
+				registerResult.next(new CognitoResponse(null, result));
+			}
+		});
+		return registerResult.asObservable();
+	}
+
+/*
+	confirmRegistration(username: string, confirmationCode: string, callback: CognitoCallback): void {
+
+		let userData = {
+			Username: username,
+			Pool: this.getUserPool()
+		};
+
+		let cognitoUser = new CognitoUser(userData);
+
+		cognitoUser.confirmRegistration(confirmationCode, true, function (err, result) {
+			if (err) {
+				callback.cognitoCallback(err.message, null);
+			} else {
+				callback.cognitoCallback(null, result);
+			}
+		});
+	}
+*/
+/*
+	resendCode(username: string, callback: CognitoCallback): void {
+		let userData = {
+			Username: username,
+			Pool: this.getUserPool()
+		};
+
+		let cognitoUser = new CognitoUser(userData);
+
+		cognitoUser.resendConfirmationCode(function (err, result) {
+			if (err) {
+				callback.cognitoCallback(err.message, null);
+			} else {
+				callback.cognitoCallback(null, result);
+			}
+		});
+	}
+*/
+	setAuthChallenge(challenge: CognitoPasswordChallenge){
+		console.log(challenge);
+		this.challenge=challenge;
+	}
+	newPassword(newPasswordUser: NewPasswordUser, extraAttributes: any): Observable<CognitoResponse> {
+		let newPasswordResult = new ReplaySubject<CognitoResponse>();
+		console.log(newPasswordUser);
+		console.log(extraAttributes);
+		if(!extraAttributes) extraAttributes = {};
+		// Get these details and call
+		//cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, this);
+		let authenticationData = {
+			Username: newPasswordUser.username,
+			Password: newPasswordUser.existingPassword,
+		};
+		let authenticationDetails = new AuthenticationDetails(authenticationData);
+
+		let userData = {
+			Username: newPasswordUser.username,
+			Pool: this.getUserPool()
+		};
+
+		console.log("UserLoginService: Params set...Authenticating the user");
+		let cognitoUser = new CognitoUser(userData);
+		//console.log("UserLoginService: config is " + AWS.config);
+		cognitoUser.authenticateUser(authenticationDetails, {
+			newPasswordRequired: function (userAttributes, requiredAttributes) {
+				// User was signed up by an admin and must provide new
+				// password and required attributes, if any, to complete
+				// authentication.
+
+				// the api doesn't accept this field back
+				delete userAttributes.email_verified;
+				cognitoUser.completeNewPasswordChallenge(newPasswordUser.password, extraAttributes, {
+					onSuccess: function (result) {
+						newPasswordResult.next(new CognitoResponse(null, userAttributes));
+					},
+					onFailure: function (err) {
+						newPasswordResult.next(new CognitoResponse(err, null));
+					}
+				});
+			},
+			onSuccess: function (result){
+				newPasswordResult.next(new CognitoResponse(null, result));
+			},
+			onFailure: function (err) {
+				newPasswordResult.next(new CognitoResponse(err, null));
+			}
+		});
+		return newPasswordResult.asObservable().first(); 
+	}
 }
