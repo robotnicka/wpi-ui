@@ -1,6 +1,7 @@
 import { NgModule }     from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthComponent } from './components/auth/auth.component';
+import { ConfirmComponent } from './components/confirm/confirm.component';
 import { LoginComponent } from './components/login/login.component';
 import { PasswordComponent } from './components/password/password.component';
 import { RegisterComponent } from './components/register/register.component';
@@ -13,6 +14,7 @@ import { RegisterComponent } from './components/register/register.component';
 				component: AuthComponent,
 				children: [
 					{ path: '', redirectTo: 'login', pathMatch: 'full' },
+					{ path: 'confirm/:email', component: ConfirmComponent },
 					{ path: 'login', component: LoginComponent },
 					{ path: 'password', component: PasswordComponent },
 					{ path: 'register', component: RegisterComponent }

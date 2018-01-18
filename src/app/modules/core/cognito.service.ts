@@ -290,7 +290,7 @@ export class CognitoUtil {
 		}
 		console.log(attributeList);
 
-		this.getUserPool().signUp(user.username, user.password, attributeList, null, function (err, result) {
+		this.getUserPool().signUp(user.username, user.password, attributeList, null, (err, result) => {
 			if (err) {
 				registerResult.next(new CognitoResponse(err.message, null));
 			} else {

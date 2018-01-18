@@ -1,5 +1,5 @@
 import {Component, OnInit, Inject} from "@angular/core";
-import {Router} from "@angular/router";
+import {Router,ActivatedRoute} from "@angular/router";
 import {CognitoUtil, CognitoResponse, LoginResponse} from "app/modules/core/cognito.service";
 
 @Component({
@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit {
 					this.errorMessage = response.message;
 					if (this.errorMessage === 'User is not confirmed.') {
 						console.log("redirecting to confirm");
-						this.router.navigate(['/auth/confirmRegistration', this.email]);
+						this.router.navigate(['/auth/confirm', this.email]);
 					} else if (this.errorMessage === 'User needs to set password.') {
 						console.log("redirecting to set new password");
 						this.router.navigate(['/auth/password']);

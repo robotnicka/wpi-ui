@@ -52,6 +52,7 @@ export class RegisterComponent implements OnInit {
 				this.errorMessage = response.message;
 			}else{
 				console.log(response.result);
+				this.router.navigate(['/auth/confirm', response.result.user.email]);
 			}
 		});
 	}
@@ -63,7 +64,7 @@ export class RegisterComponent implements OnInit {
 		} else { //success
 			//move to the next step
 			console.log("redirecting");
-			this.router.navigate(['/home/confirmRegistration', result.user.username]);
+			this.router.navigate(['/home/confirmRegistration', result.user.email]);
 		}
 	}
 }
