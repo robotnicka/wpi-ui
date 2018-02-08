@@ -1,7 +1,2 @@
-Login/Confirmation don't work with unconfirmed email address
-Switch login to use username (or email too if possible)
 Fix
-	confirmation
-	resending confirmation
-	forgot password
 	changing password (with extra required fields)

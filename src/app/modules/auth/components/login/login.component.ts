@@ -8,9 +8,11 @@ import {CognitoUtil, CognitoResponse, LoginResponse} from "app/modules/core/cogn
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-    email: string;
+    username: string;
     password: string;
     errorMessage: string;
+    needConfirm: boolean = false;
+    notFoundEmail: boolean = false;
 	loggedIn: boolean = false;
     constructor(public router: Router, @Inject('cognitoMain') private cognitoMain: CognitoUtil){
         console.log("LoginComponent constructor");
@@ -33,23 +35,29 @@ export class LoginComponent implements OnInit {
     }
 
     onLogin() {
-        if (this.email == null || this.password == null) {
+    	this.needConfirm = false;
+    	this.notFoundEmail = false;
+        if (this.username == null || this.password == null) {
             this.errorMessage = "All fields are required";
             return;
         }
         this.errorMessage = null;
-        this.cognitoMain.authenticate(this.email, this.password).subscribe(
+        this.cognitoMain.authenticate(this.username, this.password).subscribe(
         	(response: CognitoResponse) => {
 				if (response.message != null) { //error
 					this.errorMessage = response.message;
 					if (this.errorMessage === 'User is not confirmed.') {
-						console.log("redirecting to confirm");
-						this.router.navigate(['/auth/confirm', this.email]);
+						//console.log("redirecting to /auth/confirm/",this.username);
+						//this.router.navigate(['/auth/confirm', this.username]);
+						console.log('setting needConfirm');
+						this.needConfirm = true;
+					} else if (this.errorMessage == 'User does not exist.') {
+						if(this.cognitoMain.isEmail(this.username)){
+							this.notFoundEmail = true;
+						}
 					} else if (this.errorMessage === 'User needs to set password.') {
 						console.log("redirecting to set new password");
 						this.router.navigate(['/auth/password']);
-					}else{
-						
 					}
 				} else { //success
 					this.router.navigate(['/user']);

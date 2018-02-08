@@ -1,6 +1,7 @@
-import {Component, OnInit, Inject} from "@angular/core";
+import {Component, OnInit, OnDestroy, Inject} from "@angular/core";
 import {Router} from "@angular/router";
-import {CognitoUtil, CognitoResponse, NewPasswordUser} from "app/modules/core/cognito.service";
+import {Subscription} from 'rxjs/Subscription';
+import {CognitoUtil, CognitoResponse, LoginResponse, NewPasswordUser} from "app/modules/core/cognito.service";
 
 
 /**
@@ -12,28 +13,28 @@ import {CognitoUtil, CognitoResponse, NewPasswordUser} from "app/modules/core/co
   templateUrl: './password.component.html',
   styleUrls: ['./password.component.css']
 })
-export class PasswordComponent implements OnInit {
+export class PasswordComponent implements OnInit,OnDestroy {
 	registrationUser: NewPasswordUser;
 	errorMessage: string;
 	extraAttributes: any;
-
+	loggedIn: boolean = false;
+	loggedInSub: Subscription;
 	constructor(@Inject('cognitoMain') private cognitoMain: CognitoUtil, public router: Router) {
 		this.registrationUser = new NewPasswordUser();
 		this.errorMessage = null;
 		this.extraAttributes = {};
+		
 	}
 
 	ngOnInit() {
-		/*this.errorMessage = null;
-		console.log("Checking if the user is already authenticated. If so, then redirect to the user page");
-		this.cognitoMain.isAuthenticated().subscribe(
+		this.loggedInSub = this.cognitoMain.isAuthenticated().subscribe(
 			(response:LoginResponse)=>{
-				if(response.loggedIn){
-					this.router.navigate(['/user']);
-				}
-			}	
+				this.loggedIn = response.loggedIn;
+			}
 		);
-		*/
+	}
+	ngOnDestroy() {
+		if(this.loggedInSub) this.loggedInSub.unsubscribe();
 	}
 
 	onPassword() {

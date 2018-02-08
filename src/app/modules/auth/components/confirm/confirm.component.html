@@ -5,10 +5,13 @@
     <div *ngIf="errorMessage!=null" class="alert alert-danger">
         {{ errorMessage }}
     </div>
-    <div class="form-group" *ngIf="email===null">
-        <label class="control-label" for="confirmationCode">Email</label>
-        <input id="email" type="email" maxlength="50" class="form-control"
-               [(ngModel)]="email" [ngModelOptions]="{standalone: true}">
+    <div *ngIf="notFoundEmail" class="alert alert-danger">
+    	You'll need your username, not your email address, in order to confirm your email address or resend the confirmation code. Don't remember your username? Then just <a [routerLink] = "['/auth/register']">register again</a>!
+    </div>
+    <div class="form-group" *ngIf="!pathUsername">
+        <label class="control-label" for="confirmationCode">Username (<strong>NOT email</strong>)</label>
+        <input id="username" type="username" maxlength="50" class="form-control"
+               [(ngModel)]="username" [ngModelOptions]="{standalone: true}">
     </div>
     <div class="form-group">
         <label class="control-label" for="confirmationCode">Confirmation Code</label>
@@ -21,9 +24,9 @@
         </button>
     </div>
     <hr>
-    <p>Can't find your code? <a [routerLink]="['/home/resendCode']"> <i class="fa fa-fw fa-group"></i> Resend
+    <p>Can't find your code? <a [routerLink]="['/auth/resend']"> <i class="fa fa-fw fa-group"></i> Resend
         Code</a>
-        <a [routerLink]="['/home/register']"> <i class="fa fa-fw fa-group"></i> Register</a> <a
-                [routerLink]="['/home/login']"> <i class="fa fa-fw fa-user"></i> Login</a>
+        <a [routerLink]="['/auth/register']"> <i class="fa fa-fw fa-group"></i> Register</a> <a
+                [routerLink]="['/auth/login']"> <i class="fa fa-fw fa-user"></i> Login</a>
     </p>
 </form>

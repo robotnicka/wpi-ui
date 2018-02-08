@@ -114,8 +114,12 @@ export class CognitoUtil {
 		return authenticateResult.asObservable().first(); 
 	}
 
-	forgotPassword(username: string) {
+	forgotPassword(username: string): Observable<CognitoResponse> {
 		let forgotResult = new ReplaySubject<CognitoResponse>();
+		if(!username){
+			forgotResult.next(new CognitoResponse('Username is required', null));
+			return forgotResult.asObservable().first();
+		}
 		let userData = {
 			Username: username,
 			Pool: this.getUserPool()
@@ -137,10 +141,10 @@ export class CognitoUtil {
 		return forgotResult.asObservable().first();
 	}
 
-	confirmNewPassword(email: string, verificationCode: string, password: string) {
+	confirmNewPassword(username: string, verificationCode: string, password: string) : Observable<CognitoResponse> {
 		let confirmResult = new ReplaySubject<CognitoResponse>();
 		let userData = {
-			Username: email,
+			Username: username,
 			Pool: this.getUserPool()
 		};
 
@@ -161,6 +165,7 @@ export class CognitoUtil {
 		console.log("UserLoginService: Logging out");
 		this.getCurrentUser().signOut();
 		this.$loggedIn.next(new LoginResponse("User logged out", false));
+		this.router.navigate(['/auth/login']);
 
 	}
 
@@ -295,16 +300,16 @@ export class CognitoUtil {
 				registerResult.next(new CognitoResponse(err.message, null));
 			} else {
 				console.log("UserRegistrationService: registered user is " + result);
-				this.registeredUser = result.user;
+				//this.registeredUser = result.user;
 				registerResult.next(new CognitoResponse(null, result));
 			}
 		});
 		return registerResult.asObservable();
 	}
 
-/*
-	confirmRegistration(username: string, confirmationCode: string, callback: CognitoCallback): void {
 
+	confirmRegistration(username: string, confirmationCode: string): Observable<CognitoResponse> {
+		let confirmResult = new ReplaySubject<CognitoResponse>();
 		let userData = {
 			Username: username,
 			Pool: this.getUserPool()
@@ -312,17 +317,25 @@ export class CognitoUtil {
 
 		let cognitoUser = new CognitoUser(userData);
 
-		cognitoUser.confirmRegistration(confirmationCode, true, function (err, result) {
+		cognitoUser.confirmRegistration(confirmationCode, true, (err, result) => {
 			if (err) {
-				callback.cognitoCallback(err.message, null);
+				confirmResult.next(new CognitoResponse(err.message, null));
 			} else {
-				callback.cognitoCallback(null, result);
+				confirmResult.next(new CognitoResponse(null, null));
 			}
 		});
+		
+		return confirmResult.asObservable().first();
 	}
-*/
-/*
-	resendCode(username: string, callback: CognitoCallback): void {
+	
+	isEmail(username: string) : boolean{
+		var emailEx : RegExp = RegExp('^.+@.+\.');
+		return emailEx.test(username);
+	}
+
+
+	resendCode(username: string): Observable<CognitoResponse>  {
+		let resendResult = new ReplaySubject<CognitoResponse>();
 		let userData = {
 			Username: username,
 			Pool: this.getUserPool()
@@ -330,15 +343,16 @@ export class CognitoUtil {
 
 		let cognitoUser = new CognitoUser(userData);
 
-		cognitoUser.resendConfirmationCode(function (err, result) {
+		cognitoUser.resendConfirmationCode((err, result) => {
 			if (err) {
-				callback.cognitoCallback(err.message, null);
+				resendResult.next(new CognitoResponse(err.message, null));
 			} else {
-				callback.cognitoCallback(null, result);
+				resendResult.next(new CognitoResponse(null, result));
 			}
 		});
+		return resendResult.asObservable().first();
 	}
-*/
+
 	setAuthChallenge(challenge: CognitoPasswordChallenge){
 		console.log(challenge);
 		this.challenge=challenge;

@@ -5,9 +5,16 @@
     <div *ngIf="errorMessage!=null" class="alert alert-danger">
         {{ errorMessage }}
     </div>
+    <div *ngIf="needConfirm" class="alert alert-danger">
+    	It looks like you haven't <a [routerLink]="['/auth/confirm',username]">confirmed your email address</a>. Please <a [routerLink]="['/auth/confirm',username]">confirm your email address</a>, then login again. If you don't have the confirmation code, you can <a [routerLink]="['/auth/resend',username]">resend it here</a>.
+    </div>
+    <div *ngIf="notFoundEmail" class="alert alert-danger">
+    	It looks like you're attempting to login with your email address. Is your email correct? If so, please <a [routerLink]="['/auth/confirm']">confirm your email</a>, then login again. If you don't have the confirmation code, you can <a [routerLink]="['/auth/resend']">resend it here</a>.
+    	<br/>You'll need your username in order to confirm your email address or resend the confirmation code. Don't remember your username? Then just <a [routerLink] = "['/auth/register']">register again</a>!
+    </div>
     <div class="form-group">
-        <label class="control-label" for="signupEmail">Email</label>
-        <input id="signupEmail" required type="email" maxlength="100" class="form-control" [(ngModel)]="email"
+        <label class="control-label" for="signupUsername">Username Or Email</label>
+        <input id="signupUsername" required type="email" maxlength="100" class="form-control" [(ngModel)]="username"
                [ngModelOptions]="{standalone: true}">
     </div>
 
@@ -22,9 +29,9 @@
         </button>
     </div>
     <hr>
-    <p><a [routerLink]="['/home/register']"> <i class="fa fa-fw fa-group"></i> Register</a>
-        <a [routerLink]="['/home/forgotPassword']"> <i class="fa fa-fw fa-group"></i> Forgot Password?</a><br/>
-        <a [routerLink]="['/home/resendCode']"> <i class="fa fa-fw fa-group"></i> Resend Confirmation Code</a>
+    <p><a [routerLink]="['/auth/register']"> <i class="fa fa-fw fa-group"></i> Register</a>
+        <a [routerLink]="['/auth/forgot']"> <i class="fa fa-fw fa-group"></i> Forgot Password?</a><br/>
+        <a [routerLink]="['/auth/resend']"> <i class="fa fa-fw fa-group"></i> Resend Confirmation Code</a>
     </p>
 </form>
 

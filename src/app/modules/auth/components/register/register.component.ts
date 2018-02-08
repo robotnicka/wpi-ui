@@ -52,7 +52,7 @@ export class RegisterComponent implements OnInit {
 				this.errorMessage = response.message;
 			}else{
 				console.log(response.result);
-				this.router.navigate(['/auth/confirm', response.result.user.email]);
+				this.router.navigate(['/auth/confirm', response.result.user.username]);
 			}
 		});
 	}

@@ -7,6 +7,8 @@ import { AuthComponent } from './components/auth/auth.component';
 import { PasswordComponent } from './components/password/password.component';
 import { RegisterComponent } from './components/register/register.component';
 import { ConfirmComponent } from './components/confirm/confirm.component';
+import { ResendComponent } from './components/resend/resend.component';
+import { ForgotComponent } from './components/forgot/forgot.component';
 
 @NgModule({
   imports: [
@@ -14,7 +16,7 @@ import { ConfirmComponent } from './components/confirm/confirm.component';
     FormsModule,
     AuthRoutingModule
   ],
-  declarations: [LoginComponent, AuthComponent, PasswordComponent, RegisterComponent, ConfirmComponent]
+  declarations: [LoginComponent, AuthComponent, PasswordComponent, RegisterComponent, ConfirmComponent, ResendComponent, ForgotComponent]
 })
 export class AuthModule {
 	constructor() {
