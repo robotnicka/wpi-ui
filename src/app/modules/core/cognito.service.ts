@@ -4,6 +4,7 @@ import {Subject} from 'rxjs/Subject';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {Observable} from 'rxjs/Observable';
+import { map, switchMap } from 'rxjs/operators';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/catch';
@@ -204,67 +205,76 @@ export class CognitoUtil {
 	getCurrentUser() {
 		return this.getUserPool().getCurrentUser();
 	}
+	
+	getUserSession(): Observable<CognitoUserSession>{
+		return this.isAuthenticated().pipe(map(
+			(response:LoginResponse)=>
+			{
+				if(!response.loggedIn) return null;
+				else return this.getCurrentUser();
+			}
+		)).pipe(switchMap(
+			(currentUser:CognitoUser|null)=>{
+				let sessionResult = new ReplaySubject<CognitoUserSession>();
+				if (currentUser != null)
+					currentUser.getSession(function (err, session:CognitoUserSession|null) {
+						if (err) {
+							console.log("CognitoUtil: Can't get user session:" + err);
+							sessionResult.next(null);
+						}
+						else {
+							if (session.isValid()) {
+								sessionResult.next(session);
+							}else{
+								sessionResult.next(null);
+							}
+						}
+					});
+				else{
+					sessionResult.next(null);
+				}
+				return sessionResult.asObservable().first();
+			}
+		));
+	}
 
 	getAccessToken(): Observable<string> {
-		let accessTokenResult = new ReplaySubject<string>();
-		if (this.getCurrentUser() != null)
-			this.getCurrentUser().getSession(function (err, session) {
-				if (err) {
-					console.log("CognitoUtil: Can't set the credentials:" + err);
-					accessTokenResult.next(null);
+		return this.getUserSession().pipe(map(
+			(userSession: CognitoUserSession|null)=>
+			{
+				if(userSession != null){
+					return userSession.getAccessToken().getJwtToken();
+				}else{
+					return null;
 				}
-
-				else {
-					if (session.isValid()) {
-						accessTokenResult.next(session.getAccessToken().getJwtToken());
-					}
-				}
-			});
-		else
-			accessTokenResult.next(null);
-		return accessTokenResult.asObservable().first();
+			}
+		));
 	}
 
 	getIdToken(): Observable<string> {
-		let idTokenResult = new ReplaySubject<string>();
-		if (this.getCurrentUser() != null)
-			this.getCurrentUser().getSession(function (err, session) {
-				if (err) {
-					console.log("CognitoUtil: Can't set the credentials:" + err);
-					idTokenResult.next(null);
+		return this.getUserSession().pipe(map(
+			(userSession: CognitoUserSession|null)=>
+			{
+				if(userSession != null){
+					return userSession.getIdToken().getJwtToken();
+				}else{
+					return null;
 				}
-				else {
-					if (session.isValid()) {
-						idTokenResult.next(session.getIdToken().getJwtToken());
-					} else {
-						console.log("CognitoUtil: Got the id token, but the session isn't valid");
-						idTokenResult.next(null);
-					}
-				}
-			});
-		else
-			idTokenResult.next(null);
-		return idTokenResult.asObservable().first();
+			}
+		));
 	}
 
 	getRefreshToken(): Observable<string> {
-		let refreshTokenResult = new ReplaySubject<string>();
-		if (this.getCurrentUser() != null)
-			this.getCurrentUser().getSession(function (err, session) {
-				if (err) {
-					console.log("CognitoUtil: Can't set the credentials:" + err);
-					refreshTokenResult.next(null);
+		return this.getUserSession().pipe(map(
+			(userSession: CognitoUserSession|null)=>
+			{
+				if(userSession != null){
+					return userSession.getRefreshToken().getToken();
+				}else{
+					return null;
 				}
-
-				else {
-					if (session.isValid()) {
-						refreshTokenResult.next(session.getRefreshToken());
-					}
-				}
-			});
-		else
-			refreshTokenResult.next(null);
-		return refreshTokenResult.asObservable().first();
+			}
+		));
 	}
 
 	refresh(): void {
