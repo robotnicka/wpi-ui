@@ -16,7 +16,12 @@ export class HubService {
 			(idToken: string)=>
 			{
 				console.log('HubService setting id token:', idToken);
-				this.httpOptions.headers = this.httpOptions.headers.set('Authorization', idToken);
+				if(idToken == null){
+					if(this.httpOptions.headers.has('Authorization')){
+						this.httpOptions.headers = this.httpOptions.headers.delete('Authorization');
+					}
+				}
+				else this.httpOptions.headers = this.httpOptions.headers.set('Authorization', idToken);
 			}
 		);
 	}
