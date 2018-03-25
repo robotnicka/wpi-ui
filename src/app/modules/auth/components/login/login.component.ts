@@ -4,8 +4,7 @@ import {CognitoUtil, CognitoResponse, LoginResponse} from "app/modules/core/cogn
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  templateUrl: './login.component.html'
 })
 export class LoginComponent implements OnInit {
     username: string;
@@ -60,7 +59,7 @@ export class LoginComponent implements OnInit {
 						this.router.navigate(['/auth/password']);
 					}
 				} else { //success
-					this.router.navigate(['/user']);
+					this.router.navigate(['/members']);
 				}
         	}
         );

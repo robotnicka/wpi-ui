@@ -4,8 +4,7 @@ import { GuardService } from 'app/modules/core/guard.service';
 const routes: Routes = [
 	{ path: '', loadChildren: 'app/modules/home/home.module#HomeModule' },
 	{ path: 'auth', loadChildren: 'app/modules/auth/auth.module#AuthModule'},
-	{ path: 'user', loadChildren: 'app/modules/user/user.module#UserModule', canActivate: [GuardService]},
-	//{ path: 'user', loadChildren: 'app/modules/user/user.module#UserModule',},
+	{ path: 'members', loadChildren: 'app/modules/members/members.module#MembersModule', canActivate: [GuardService]},
 ];
 
 @NgModule({

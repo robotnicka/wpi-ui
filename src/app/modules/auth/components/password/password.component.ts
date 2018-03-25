@@ -10,8 +10,7 @@ import {CognitoUtil, CognitoResponse, LoginResponse, NewPasswordUser} from "app/
  */
 @Component({
   selector: 'app-password',
-  templateUrl: './password.component.html',
-  styleUrls: ['./password.component.css']
+  templateUrl: './password.component.html'
 })
 export class PasswordComponent implements OnInit,OnDestroy {
 	registrationUser: NewPasswordUser;
@@ -49,7 +48,7 @@ export class PasswordComponent implements OnInit,OnDestroy {
 				} else { //success
 					//move to the next step
 					console.log("redirecting");
-					this.router.navigate(['/user']);
+					this.router.navigate(['/members']);
 				}
 			}
 		);

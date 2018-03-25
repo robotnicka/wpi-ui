@@ -4,8 +4,7 @@ import {CognitoUtil, CognitoResponse} from "app/modules/core/cognito.service";
 
 @Component({
 	selector: 'app-forgot',
-	templateUrl: './forgot.component.html',
-	styleUrls: ['./forgot.component.css']
+	templateUrl: './forgot.component.html'
 })
 export class ForgotComponent {
 	public notFoundEmail: boolean = false;

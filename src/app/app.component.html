@@ -1,18 +1,1 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-</div>
-<h2>Here are some routes to help you start: </h2>
-<ul>
-  <li><a routerLink="">Home</a></li>
-  <li *ngIf="loggedIn"><a routerLink="/user">User</a></li>
-  <li *ngIf="!loggedIn"><a routerLink="/auth/login">Login</a></li>
-  <li *ngIf="!loggedIn"><a routerLink="/auth/forgot">Forgot Password?</a></li>
-  <li *ngIf="!loggedIn"><a routerLink="/auth/register">Register</a></li>
-  <li *ngIf="loggedIn"><a routerLink="/auth/password">Change Password</a></li>
-  <li *ngIf="loggedIn"><a href="#" (click)="logout()">Logout</a></li>
-</ul>
-
-<router-outlet></router-outlet>
+<app-nav></app-nav>

@@ -4,8 +4,7 @@ import {CognitoUtil, CognitoResponse} from "app/modules/core/cognito.service";
 
 @Component({
 	selector: 'app-resend',
-	templateUrl: './resend.component.html',
-	styleUrls: ['./resend.component.css']
+	templateUrl: './resend.component.html'
 })
 export class ResendComponent implements OnInit, OnDestroy {
 	pathUsername: string;

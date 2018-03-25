@@ -1,24 +1,12 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
-import {Subscription} from 'rxjs/Subscription';
-import {HubService} from "app/modules/core/hub.service";
+import { Component } from '@angular/core';
+
 @Component({
   selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  templateUrl: './home.component.html'
 })
-export class HomeComponent implements OnDestroy{
-	userSubscription: Subscription;
-	constructor(private hubService: HubService){
-		this.userSubscription = this.hubService.getUser().subscribe(
-			(user) =>
-			{
-				console.log('have user in home component',user);
-			}
-		);
-	}
-	
-	ngOnDestroy(){
-		this.userSubscription.unsubscribe();
+export class HomeComponent{
+	constructor(){
+
 	}
 	
 
