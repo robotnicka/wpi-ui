@@ -93,18 +93,18 @@ button {
         margin-right: 4px;
     }
     
-    &.ballot-svg,
-    &.userhub-svg {
+    &.members-svg,
+    &.locations-svg {
         vertical-align: middle;
         margin-right: 10px;
     }
     
-    &.ballot-svg {
-        width: 24px;
-        height: 24px;
+    &.locations-svg {
+        width: 18px;
+        height: 18px;
     }
 
-    &.userhub-svg {
+    &.members-svg {
         width: 18px;
         height: 18px;
     }
@@ -171,8 +171,8 @@ button {
   100% { opacity: .75 }
 }
 
-.ballot-icon,
-.user-icon {
+.user-icon,
+.locations-icon {
     fill: #fff;
 }
 
