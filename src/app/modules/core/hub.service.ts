@@ -29,7 +29,7 @@ export class HubService {
 		);
 	}
 	
-	getCurrentUser():Observable<any>{
+	getCurrentUser():Observable<User>{
 		//Current user depends on the current ID Token. Switchmap on the idToken so that we can update the user as needed
 		return this.currentIdToken.asObservable()
 		.pipe(switchMap(
@@ -38,10 +38,14 @@ export class HubService {
 					return Observable.of(null);
 				}
 				else{
-					return this.http.get(environment.hub.url+'user/me',{headers: this.headers});
+					return this.getUser('me')
 				}
 			}
 		));
+	}
+	
+	public getUser(id: any, options: any = {}):Observable<User>{
+		return this.http.get<User>(environment.hub.url+'user/'+id,{headers: this.headers, params: options});
 	}
 	
 	public getOrgUnits(search: OrgUnitSearch): Observable<OrgUnit[]>{

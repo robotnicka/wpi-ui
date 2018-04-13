@@ -1,0 +1,24 @@
+<ng-container *ngIf="member">
+	<h1>{{member.firstName}} {{member.lastName}}</h1>
+	<ul style="list-style-type: none;" *ngIf="!editing">
+		<li><label>Name:</label> <span>{{member.firstName}} {{member.lastName}}</span></li>
+		<li><label>Membership Type:</label> <span>{{member.membershipType}}</span></li>
+		<li *ngIf="member.membershipNumber"><label>Membership #:</label> <span>{{member.membershipNumber}}</span></li>
+		<li *ngIf="member.membershipNumber"><label>Expiration:</label> <span>{{member.membershipExpiration}}</span></li>
+		<li><label>Location:</label>
+			<span *ngIf="!member.orgUnit">None</span>
+			<span *ngIf="member.orgUnit"><a [routerLink]="['/locations',member.orgUnit.id]">{{member.orgUnit.name}} ({{member.orgUnit.code}})</a></span>
+		</li>
+	</ul>
+	<div *ngIf="editing">
+		
+	</div>
+	<div *ngIf="member.offices && member.offices.length"><h1>Offices</h1>
+		<ul style="list-style-type: none;">
+			<li *ngFor="let office of member.offices">
+				<span>{{office.name}} ({{office.type}}), <a [routerLink]="['/locations',office.unit.id]">{{office.unit.name}} ({{office.unit.code}})</a></span>
+				<span *ngIf="office.email"><a href="mailto:{{office.email}}">{{office.email}}</a></span>
+			</li>
+		</ul>
+	</div>
+</ng-container>
