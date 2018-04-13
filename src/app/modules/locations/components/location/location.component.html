@@ -1,3 +1,32 @@
-<p>
-  location works!
-</p>
+<ng-container *ngIf="orgUnit && orgUnit.unit">
+	<h1>Location</h1>
+	<ul style="list-style-type: none;" *ngIf="!editing">
+		<li><label>Code:</label> <span>{{orgUnit.unit.code}}</span></li>
+		<li><label>Name:</label> <span>{{orgUnit.unit.name}}</span></li>
+		<li><label>Location:</label> <span>{{orgUnit.unit.location}}</span></li>
+		<li><label>Type:</label> <span *ngIf="orgUnit.unit.type!='Domain'">{{orgUnit.unit.type}}</span><span *ngIf="orgUnit.unit.type=='Domain'">Chapter</span></li>
+		<li><label>Boundaries:</label> <span>{{orgUnit.unit.defDoc}}</span></li>
+		<li><label>Website:</label> <span><a [href]="orgUnit.unit.website" target="_blank">{{orgUnit.unit.website}}</a></span></li>
+	</ul>
+	<div *ngIf="editing">
+		
+	</div>
+	<div><h1>Officers</h1>
+		<span *ngIf="!orgUnit.unit.offices || orgUnit.unit.offices.length == 0">None!</span>
+		<ul style="list-style-type: none;" *ngIf="orgUnit.unit.offices.length">
+			<li *ngFor="let office of orgUnit.unit.offices">
+				<span>{{office.name}} ({{office.type}}):</span>
+				<span *ngIf="!office.user">Vacant</span>
+				<span *ngIf="office.user">{{office.user.firstName}} {{office.user.lastName}} ({{office.user.membershipNumber}})</span>
+			</li>
+		</ul>
+	</div>
+	<div><h1>Members</h1>
+		<span *ngIf="!orgUnit.unit.users || orgUnit.unit.users.length == 0">None!</span>
+		<ul style="list-style-type: none;" *ngIf="orgUnit.unit.users.length">
+			<li *ngFor="let member of orgUnit.unit.users">
+				<span>{{member.firstName}} {{member.lastName}} ({{member.membershipNumber}})</span>
+			</li>
+		</ul>
+	</div>
+</ng-container>

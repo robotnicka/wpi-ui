@@ -23,7 +23,10 @@ export class LocationComponent implements OnInit, OnDestroy {
 			.pipe(switchMap((params: Params) => {
 				return this.hubService.getOrgUnit(params['id'],false);
 			})).subscribe(
-				(orgUnit) => {this.orgUnit = orgUnit; console.log(this.orgUnit);}
+				(orgUnit) => {
+					this.orgUnit = orgUnit;
+					console.log('got location unit',this.orgUnit);
+				}
 			);
 	}
 	ngOnDestroy(){
