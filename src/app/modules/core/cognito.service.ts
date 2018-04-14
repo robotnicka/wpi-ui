@@ -299,7 +299,7 @@ export class CognitoUtil {
 
 		let attributeList = [];
 		user.address = JSON.stringify(user.addressInfo);
-		let attributeNames = ['email', 'name','address', 'birthdate'];
+		let attributeNames = ['email', 'name','address', 'birthdate', 'nickname'];
 		for(let i = 0; i < attributeNames.length; i++){
 			attributeList.push(new CognitoUserAttribute({Name: attributeNames[i], Value: user[attributeNames[i]]})); 
 		}

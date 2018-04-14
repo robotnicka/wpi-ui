@@ -1,7 +1,7 @@
 <ng-container *ngIf="member">
-	<h1>{{member.firstName}} {{member.lastName}}</h1>
+	<h1>{{member.nickname}}</h1>
 	<ul style="list-style-type: none;" *ngIf="!editing">
-		<li><label>Name:</label> <span>{{member.firstName}} {{member.lastName}}</span></li>
+		<li><label>Name:</label> <span>{{member.nickname}}</span></li>
 		<li><label>Membership Type:</label> <span>{{member.membershipType}}</span></li>
 		<li *ngIf="member.membershipNumber"><label>Membership #:</label> <span>{{member.membershipNumber}}</span></li>
 		<li *ngIf="member.membershipNumber"><label>Expiration:</label> <span>{{member.membershipExpiration}}</span></li>

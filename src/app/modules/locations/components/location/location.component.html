@@ -17,7 +17,7 @@
 			<li *ngFor="let office of orgUnit.unit.offices">
 				<span>{{office.name}} ({{office.type}}):</span>
 				<span *ngIf="!office.user">Vacant</span>
-				<span *ngIf="office.user"><a [routerLink]="['/members',office.user.id]">{{office.user.firstName}} {{office.user.lastName}} ({{office.user.membershipNumber}})</a></span>
+				<span *ngIf="office.user"><a [routerLink]="['/members',office.user.id]">{{office.user.nickname}} ({{office.user.membershipNumber}})</a></span>
 				<span *ngIf="office.email">Email: <a href="mailto:{{office.email}}">{{office.email}}</a></span>
 			</li>
 		</ul>
@@ -26,7 +26,7 @@
 		<span *ngIf="!orgUnit.unit.users || orgUnit.unit.users.length == 0">None!</span>
 		<ul style="list-style-type: none;" *ngIf="orgUnit.unit.users.length">
 			<li *ngFor="let member of orgUnit.unit.users">
-				<span><a [routerLink]="['/members',member.id]">{{member.firstName}} {{member.lastName}} ({{member.membershipNumber}})</a></span>
+				<span><a [routerLink]="['/members',member.id]">{{member.nickname}} ({{member.membershipNumber}})</a></span>
 			</li>
 		</ul>
 	</div>

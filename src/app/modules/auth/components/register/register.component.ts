@@ -5,6 +5,7 @@ import {CognitoUtil, CognitoResponse} from "app/modules/core/cognito.service";
 export class RegistrationUser {
 	name: string;
 	username: string;
+	nickname: string;
 	email: string;
 	password: string;
 	addressInfo: RegistrationAddressInfo;
