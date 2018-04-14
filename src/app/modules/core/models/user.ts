@@ -1,4 +1,5 @@
 import {OrgUnit} from './org-unit';
+import {Office} from './office';
 export class User {
   address: string;
   email: string;
@@ -11,4 +12,5 @@ export class User {
   membershipType: string;
   nickname: string;
   orgUnit: OrgUnit;
+  offices: Office[];
 }

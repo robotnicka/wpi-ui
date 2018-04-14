@@ -4,7 +4,7 @@ import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/Rx';
 import { Observable } from 'rxjs/Observable';
 import { HubService} from 'app/modules/core/hub.service';
-import { OrgUnit} from 'app/modules/core/models/';
+import { Office, OrgUnit} from 'app/modules/core/models/';
 
 
 @Component({
@@ -13,7 +13,9 @@ import { OrgUnit} from 'app/modules/core/models/';
 })
 export class LocationComponent implements OnInit, OnDestroy {
 	orgSubscription: Subscription;
+	officeSubscription: Subscription;
 	orgUnit: OrgUnit;
+	userOffices: Office[];
 	constructor(private hubService: HubService,
 		private route: ActivatedRoute,
 		private router: Router) { }
@@ -23,13 +25,23 @@ export class LocationComponent implements OnInit, OnDestroy {
 			.pipe(switchMap((params: Params) => {
 				return this.hubService.getOrgUnit(params['id'],false);
 			})).subscribe(
-				(orgUnit) => {
+				(orgUnit:OrgUnit) => {
 					this.orgUnit = orgUnit;
 					console.log('got location unit',this.orgUnit);
+				}
+			);
+		this.officeSubscription = this.route.params
+			.pipe(switchMap((params: Params) => {
+				return this.hubService.getOrgUnitAuthority(params['id']);
+			})).subscribe(
+				(offices:Office[]) => {
+					this.userOffices = offices;
+					console.log('unit offices',this.userOffices);
 				}
 			);
 	}
 	ngOnDestroy(){
 		this.orgSubscription.unsubscribe();
+		this.officeSubscription.unsubscribe();
 	}
 }

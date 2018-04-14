@@ -6,7 +6,7 @@ import { map, switchMap } from 'rxjs/operators';
 import 'rxjs/add/observable/of';
 import { environment } from 'environments/environment';
 import {CognitoUtil} from "app/modules/core/cognito.service";
-import { User, OrgUnit, OrgUnitSearch } from './models/';
+import { User, Office, OrgUnit, OrgUnitSearch } from './models/';
 
 @Injectable()
 export class HubService {
@@ -38,8 +38,21 @@ export class HubService {
 					return Observable.of(null);
 				}
 				else{
-					return this.getUser('me')
+					return this.getUser('me',{offices: 1});
 				}
+			}
+		));
+	}
+	
+	getOrgUnitAuthority(id: number): Observable<Office[]>{
+		return this.getCurrentUser().pipe(switchMap(
+			(user:User)=>{
+				if(user.offices && user.offices.length){
+					return this.http.get<Office[]>(environment.hub.url+'office/verify/orgunit/'+id,
+						{headers: this.headers,
+							params:{roles:"user_read_private,user_update,user_assign,user_suspend,org_update,office_update,office_assign,office_create_own_assistants,office_create_assistants,org_create_domain"}});
+				}
+				else return Observable.of([]) as Observable<Office[]>;
 			}
 		));
 	}
