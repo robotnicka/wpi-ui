@@ -1,5 +1,13 @@
 <ng-container *ngIf="orgUnit && orgUnit.unit">
+	<div *ngIf="userOffices && userOffices.length">
+		<span>Viewing as office:</span>
+		<span *ngIf="userOffices.length==1">{{userOffices[0].name}}</span>
+		<select *ngIf="userOffices.length>1" [(ngModel)]="selectedOffice" (change)="officePermissions(selectedOffice)">
+			<option *ngFor="let officeOption of userOffices" [ngValue]="officeOption">{{officeOption.name}}</option>
+		</select>
+	</div>
 	<h1>Location</h1>
+	
 	<ul style="list-style-type: none;" *ngIf="!editing">
 		<li><label>Code:</label> <span>{{orgUnit.unit.code}}</span></li>
 		<li><label>Name:</label> <span>{{orgUnit.unit.name}}</span></li>

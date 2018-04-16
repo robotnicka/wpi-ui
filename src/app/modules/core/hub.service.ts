@@ -48,9 +48,11 @@ export class HubService {
 		return this.getCurrentUser().pipe(switchMap(
 			(user:User)=>{
 				if(user.offices && user.offices.length){
-					return this.http.get<Office[]>(environment.hub.url+'office/verify/orgunit/'+id,
+					return this.http.get(environment.hub.url+'office/verify/orgunit/'+id,
 						{headers: this.headers,
-							params:{roles:"user_read_private,user_update,user_assign,user_suspend,org_update,office_update,office_assign,office_create_own_assistants,office_create_assistants,org_create_domain"}});
+							params:{roles:"user_read_private,user_update,user_assign,user_suspend,org_update,office_update,office_assign,office_create_own_assistants,office_create_assistants,org_create_domain"}})
+							.pipe(map((response:any) => response.offices))
+							.catch((error:any) => { return Observable.of([]);});
 				}
 				else return Observable.of([]) as Observable<Office[]>;
 			}

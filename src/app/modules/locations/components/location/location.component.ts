@@ -16,6 +16,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 	officeSubscription: Subscription;
 	orgUnit: OrgUnit;
 	userOffices: Office[];
+	selectedOffice: Office;
 	constructor(private hubService: HubService,
 		private route: ActivatedRoute,
 		private router: Router) { }
@@ -37,11 +38,20 @@ export class LocationComponent implements OnInit, OnDestroy {
 				(offices:Office[]) => {
 					this.userOffices = offices;
 					console.log('unit offices',this.userOffices);
+					if(this.userOffices.length == 0) this.selectedOffice = null;
+					else{
+						this.selectedOffice = this.userOffices[0];
+						this.officePermissions(this.selectedOffice);
+					}
+					
 				}
 			);
 	}
 	ngOnDestroy(){
 		this.orgSubscription.unsubscribe();
 		this.officeSubscription.unsubscribe();
+	}
+	officePermissions(office){
+		console.log('selected office', office);
 	}
 }
