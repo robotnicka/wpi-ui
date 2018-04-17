@@ -1,28 +1,36 @@
-<ng-container *ngIf="orgUnit && orgUnit.unit">
+<ng-container *ngIf="orgUnit">
 	<div *ngIf="userOffices && userOffices.length">
 		<span>Viewing as office:</span>
-		<span *ngIf="userOffices.length==1">{{userOffices[0].name}}</span>
-		<select *ngIf="userOffices.length>1" [(ngModel)]="selectedOffice" (change)="officePermissions(selectedOffice)">
+		<span *ngIf="userOffices.length==1 || editing">{{userOffices[0].name}}</span>
+		<select *ngIf="userOffices.length>1 && !editing" [(ngModel)]="selectedOffice" (change)="officePermissions(selectedOffice)">
 			<option *ngFor="let officeOption of userOffices" [ngValue]="officeOption">{{officeOption.name}}</option>
 		</select>
 	</div>
-	<h1>Location</h1>
-	
-	<ul style="list-style-type: none;" *ngIf="!editing">
-		<li><label>Code:</label> <span>{{orgUnit.unit.code}}</span></li>
-		<li><label>Name:</label> <span>{{orgUnit.unit.name}}</span></li>
-		<li><label>Location:</label> <span>{{orgUnit.unit.location}}</span></li>
-		<li><label>Type:</label> <span *ngIf="orgUnit.unit.type!='Domain'">{{orgUnit.unit.type}}</span><span *ngIf="orgUnit.unit.type=='Domain'">Chapter</span></li>
-		<li><label>Boundaries:</label> <span>{{orgUnit.unit.defDoc}}</span></li>
-		<li><label>Website:</label> <span><a [href]="orgUnit.unit.website" target="_blank">{{orgUnit.unit.website}}</a></span></li>
-	</ul>
+	<h1>Location: {{orgUnit.name}}</h1>
+	<button type="button" class="btn btn-primary" *ngIf="!editing && selectedOffice?.roles && selectedOffice.roles.indexOf('org_update') !== -1" (click)="editOrg()">Edit</button>
+	<div *ngIf="!editing">
+		<ul style="list-style-type: none;">
+			<li><label>Code:</label> <span>{{orgUnit.code}}</span></li>
+			<li><label>Name:</label> <span>{{orgUnit.name}}</span></li>
+			<li><label>Location:</label> <span>{{orgUnit.location}}</span></li>
+			<li><label>Type:</label> <span *ngIf="orgUnit.type!='Domain'">{{orgUnit.type}}</span><span *ngIf="orgUnit.type=='Domain'">Chapter</span></li>
+			<li><label>Website:</label> <span><a [href]="orgUnit.website" target="_blank">{{orgUnit.website}}</a></span></li>
+		</ul>
+		<p>{{orgUnit.defDoc}}</p>
+	</div>
 	<div *ngIf="editing">
-		
+		<label>Code:</label> <input type="text" [(ngModel)]="editOrgUnit.code"/><br/>
+		<label>Name:</label> <input type="text" [(ngModel)]="editOrgUnit.name"/><br/>
+		<label>Location:</label> <input type="text" [(ngModel)]="editOrgUnit.location"/><br/>
+		<label>Website:</label> <input type="text" [(ngModel)]="editOrgUnit.website"/><br/>
+		<label>Description</label> <textarea [(ngModel)]="editOrgUnit.defDoc"></textarea><br/>
+		<button type="button" class="btn btn-primary" (click)="saveOrg()">Save</button>
+		<button type="button" class="btn btn-primary" (click)="cancelOrg()">Cancel</button>
 	</div>
 	<div><h1>Officers</h1>
-		<span *ngIf="!orgUnit.unit.offices || orgUnit.unit.offices.length == 0">None!</span>
-		<ul style="list-style-type: none;" *ngIf="orgUnit.unit.offices.length">
-			<li *ngFor="let office of orgUnit.unit.offices">
+		<span *ngIf="!orgUnit.offices || orgUnit.offices.length == 0">None!</span>
+		<ul style="list-style-type: none;" *ngIf="orgUnit.offices.length">
+			<li *ngFor="let office of orgUnit.offices">
 				<span>{{office.name}} ({{office.type}}):</span>
 				<span *ngIf="!office.user">Vacant</span>
 				<span *ngIf="office.user"><a [routerLink]="['/members',office.user.id]">{{office.user.nickname}} ({{office.user.membershipNumber}})</a></span>
@@ -31,9 +39,9 @@
 		</ul>
 	</div>
 	<div><h1>Members</h1>
-		<span *ngIf="!orgUnit.unit.users || orgUnit.unit.users.length == 0">None!</span>
-		<ul style="list-style-type: none;" *ngIf="orgUnit.unit.users.length">
-			<li *ngFor="let member of orgUnit.unit.users">
+		<span *ngIf="!orgUnit.users || orgUnit.users.length == 0">None!</span>
+		<ul style="list-style-type: none;" *ngIf="orgUnit.users.length">
+			<li *ngFor="let member of orgUnit.users">
 				<span><a [routerLink]="['/members',member.id]">{{member.nickname}} ({{member.membershipNumber}})</a></span>
 			</li>
 		</ul>

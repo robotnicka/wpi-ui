@@ -88,5 +88,14 @@ export class HubService {
 			.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error')); 
 	}
 	
+	public updateOrgUnit(orgUnit:OrgUnit):Observable<OrgUnit>{
+		let post = {};
+		let fields = ['name','code','location','defDoc','website'];
+		for(let i = 0; i < fields.length; i++){
+			if(orgUnit[fields[i]]) post[fields[i]] = orgUnit[fields[i]];
+		}
+		return this.http.put<OrgUnit>(environment.hub.url+'org-unit/'+orgUnit.id,post,{headers: this.headers});
+	}
+	
 	
 }
