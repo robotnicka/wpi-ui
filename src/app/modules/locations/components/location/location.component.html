@@ -15,6 +15,7 @@
 			<li><label>Location:</label> <span>{{orgUnit.location}}</span></li>
 			<li><label>Type:</label> <span *ngIf="orgUnit.type!='Domain'">{{orgUnit.type}}</span><span *ngIf="orgUnit.type=='Domain'">Chapter</span></li>
 			<li><label>Website:</label> <span><a [href]="orgUnit.website" target="_blank">{{orgUnit.website}}</a></span></li>
+			<li *ngIf="orgUnit.parents && orgUnit.parents.length"><label>Parent Location:</label> <span><a [routerLink]="['/locations',orgUnit.parents[0].id]">{{orgUnit.parents[0].name}} ({{orgUnit.parents[0].code}})</a></span></li>
 		</ul>
 		<p>{{orgUnit.defDoc}}</p>
 	</div>
@@ -32,9 +33,18 @@
 		<ul style="list-style-type: none;" *ngIf="orgUnit.offices.length">
 			<li *ngFor="let office of orgUnit.offices">
 				<span>{{office.name}} ({{office.type}}):</span>
-				<span *ngIf="!office.user">Vacant</span>
-				<span *ngIf="office.user"><a [routerLink]="['/members',office.user.id]">{{office.user.nickname}} ({{office.user.membershipNumber}})</a></span>
+				<span *ngIf="!office?.user?.membershipNumber">Vacant</span>
+				<span *ngIf="office?.user?.membershipNumber"><a [routerLink]="['/members',office.user.id]">{{office.user.nickname}} ({{office.user.membershipNumber}})</a></span>
 				<span *ngIf="office.email">Email: <a href="mailto:{{office.email}}">{{office.email}}</a></span>
+			</li>
+		</ul>
+	</div>
+	<div>
+		<h1>Locations in {{orgUnit.name}}</h1>
+		<span *ngIf="!orgUnit.children || orgUnit.children.length == 0">None!</span>
+		<ul style="list-style-type: none;" *ngIf="orgUnit.children?.length">
+			<li *ngFor="let childUnit of orgUnit.children">
+				<span><a [routerLink]="['/locations',childUnit.id]">{{childUnit.name}} ({{childUnit.code}})</a></span>
 			</li>
 		</ul>
 	</div>

@@ -63,7 +63,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 		this.editing=false;
 	}
 	saveOrg(){
-		this.hubService.updateOrgUnit(this.editOrgUnit).subscribe(
+		this.hubService.updateOrgUnit(this.editOrgUnit,this.selectedOffice).subscribe(
 			(orgUnit:OrgUnit)=>
 			{
 				this.editing=false;
