@@ -13,6 +13,8 @@ export class HubService {
 	headers: HttpHeaders;
 	private currentIdToken: BehaviorSubject<string> = new BehaviorSubject(null);
 	private currentUser: Observable<User>;
+	public orgUnitTypes:string[] = [];
+	public officeRoles:Object = {};
 	constructor(private http: HttpClient, @Inject('cognitoMain') private cognitoMain: CognitoUtil) {
 		console.log("constructing hub service");
 		this.headers = new HttpHeaders({'Content-Type':  'application/json'});
@@ -27,6 +29,14 @@ export class HubService {
 				}
 				else this.headers = this.headers.set('Authorization', idToken);
 				this.currentIdToken.next(idToken);
+			}
+		);
+		this.http.get<string[]>(environment.hub.url+'org-unit/types').subscribe(
+			(response:string[]) => { this.orgUnitTypes = response;}
+		);
+		this.http.get<Object>(environment.hub.url+'office/roles').subscribe(
+			(response:Object) => {
+				this.officeRoles = response;
 			}
 		);
 	}
@@ -57,9 +67,9 @@ export class HubService {
 				if(user.offices && user.offices.length){
 					return this.http.get(environment.hub.url+'office/verify/orgunit/'+id,
 						{headers: this.headers,
-							params:{roles:"user_read_private,user_update,user_assign,user_suspend,org_update,office_update,office_assign,office_create_own_assistants,office_create_assistants,org_create_domain"}})
+							params:{roles:Object.keys(this.officeRoles).join(',')}})
 							.pipe(map((response:any) => response.offices))
-							.catch((error:any) => { return Observable.of([] as Observable<Office[]);});
+							.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;});
 				}
 				else return Observable.of([]) as Observable<Office[]>;
 			}
