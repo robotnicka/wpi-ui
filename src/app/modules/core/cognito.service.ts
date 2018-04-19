@@ -208,9 +208,9 @@ export class CognitoUtil {
 	
 	getUserSession(): Observable<CognitoUserSession>{
 		return this.isAuthenticated().pipe(map(
-			(response:LoginResponse)=>
+			(response:LoginResponse|null)=>
 			{
-				if(!response.loggedIn) return null;
+				if(!response || !response.loggedIn) return null;
 				else return this.getCurrentUser();
 			}
 		)).pipe(switchMap(

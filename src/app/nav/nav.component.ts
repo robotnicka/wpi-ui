@@ -1,5 +1,5 @@
 import { Inject } from '@angular/core';
-import { CollapseModule } from 'ng2-bootstrap/collapse';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { HubService } from 'app/modules/core/hub.service';
 import { CognitoUtil, LoginResponse } from 'app/modules/core/cognito.service';
 import { SubmenuService } from 'app/modules/core/submenu.service';

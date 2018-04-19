@@ -26,7 +26,7 @@
 		<label>Website:</label> <input type="text" [(ngModel)]="editOrgUnit.website"/><br/>
 		<label>Description</label> <textarea [(ngModel)]="editOrgUnit.defDoc"></textarea><br/>
 		<button type="button" class="btn btn-primary" (click)="saveOrg()">Save</button>
-		<button type="button" class="btn btn-primary" (click)="cancelOrg()">Cancel</button>
+		<button type="button" class="btn btn-secondary" (click)="cancelOrg()">Cancel</button>
 	</div>
 	<div><h1>Officers</h1>
 		<span *ngIf="!orgUnit.offices || orgUnit.offices.length == 0">None!</span>
@@ -47,6 +47,7 @@
 				<span><a [routerLink]="['/locations',childUnit.id]">{{childUnit.name}} ({{childUnit.code}})</a></span>
 			</li>
 		</ul>
+		<button type="button" class="btn btn-primary" *ngFor="let addOrg of canAddOrgs" (click)="addOrgModal(addorg)">Add {{addOrg}}</button>
 	</div>
 	<div><h1>Members</h1>
 		<span *ngIf="!orgUnit.users || orgUnit.users.length == 0">None!</span>

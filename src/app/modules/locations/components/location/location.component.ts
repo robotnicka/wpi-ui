@@ -4,9 +4,9 @@ import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/Rx';
 import { Observable } from 'rxjs/Observable';
 import { ToastrService } from 'ngx-toastr';
+import { BsModalService } from 'ngx-bootstrap/modal';
 import { HubService} from 'app/modules/core/hub.service';
 import { Office, OrgUnit} from 'app/modules/core/models/';
-
 
 @Component({
 	selector: 'app-location',
@@ -19,11 +19,13 @@ export class LocationComponent implements OnInit, OnDestroy {
 	editOrgUnit: OrgUnit;
 	userOffices: Office[];
 	selectedOffice: Office;
+	canAddOrgs: string[];
 	editing: boolean = false;
 	constructor(private hubService: HubService,
 		private route: ActivatedRoute,
 		private router: Router,
-		private toastr: ToastrService) { }
+		private toastr: ToastrService,
+		private modalService: BsModalService) { }
 
 	ngOnInit() {
 		this.getOrg();
@@ -79,11 +81,35 @@ export class LocationComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
+	addOrgModal(){
+		const initialState = {
+			list: [
+			'Open a modal with component',
+			'Pass your data',
+			'Do something else',
+			'...'
+			],
+			title: 'Modal with component'
+		};
+		//this.modalService.show(LocationAddModalComponent, {initialState});
+	}
 	ngOnDestroy(){
 		this.orgSubscription.unsubscribe();
 		this.officeSubscription.unsubscribe();
 	}
 	officePermissions(office){
 		console.log('selected office', office);
+		this.canAddOrgs = [];
+		if(!office || !office.roles || !office.roles.length) return;
+		let types = this.hubService.orgUnitTypes;
+		let currentOrgTypeIndex = types.indexOf(this.orgUnit.type);
+		if(currentOrgTypeIndex != -1){
+			for(let i =currentOrgTypeIndex+1; i<types.length; i++){ //loop through all the org unit types smaller than the current unit
+				if(office.roles.indexOf('org_create_'+types[i].toLowerCase())!=-1){
+					this.canAddOrgs.push(types[i]); //if this officer has permissions to create this unit type, add to list of units we can add here
+				}
+			}
+		}
+		console.log('canAddOrgs',this.canAddOrgs);
 	}
 }
