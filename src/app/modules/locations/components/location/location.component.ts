@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, TemplateRef, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/Rx';
 import { Observable } from 'rxjs/Observable';
 import { ToastrService } from 'ngx-toastr';
 import { BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { HubService} from 'app/modules/core/hub.service';
 import { Office, OrgUnit} from 'app/modules/core/models/';
 
@@ -13,6 +14,7 @@ import { Office, OrgUnit} from 'app/modules/core/models/';
 	templateUrl: './location.component.html'
 })
 export class LocationComponent implements OnInit, OnDestroy {
+	modalRef: BsModalRef;
 	orgSubscription: Subscription;
 	officeSubscription: Subscription;
 	orgUnit: OrgUnit;
@@ -20,6 +22,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 	userOffices: Office[];
 	selectedOffice: Office;
 	canAddOrgs: string[];
+	orgModel: OrgUnit;
 	editing: boolean = false;
 	constructor(private hubService: HubService,
 		private route: ActivatedRoute,
@@ -81,17 +84,29 @@ export class LocationComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
-	addOrgModal(){
-		const initialState = {
-			list: [
-			'Open a modal with component',
-			'Pass your data',
-			'Do something else',
-			'...'
-			],
-			title: 'Modal with component'
-		};
+	addOrgModal(template: TemplateRef<any>, addOrgType: string){
+		this.orgModel = new OrgUnit();
+		this.orgModel.type = addOrgType;
+		console.log(this.orgModel);
+		this.modalRef = this.modalService.show(template);
 		//this.modalService.show(LocationAddModalComponent, {initialState});
+	}
+	addOrg(){
+		this.hubService.addOrgUnit(this.orgModel,this.orgUnit.id,this.selectedOffice).subscribe(
+			(orgUnit:OrgUnit)=>
+			{
+				this.getOrg();
+				this.toastr.success('Location added!');
+				this.modalRef.hide();
+			},
+			(error)=>{
+				let message = '';
+				if(error.error && error.error.message) message = error.error.message;
+				else if(error.message) message = error.message;
+				else message='Unknown server error';
+				this.toastr.error(message);
+			}
+		);
 	}
 	ngOnDestroy(){
 		this.orgSubscription.unsubscribe();

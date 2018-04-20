@@ -115,5 +115,16 @@ export class HubService {
 		return this.http.put<OrgUnit>(environment.hub.url+'org-unit/'+orgUnit.id,post,{headers: this.headers});
 	}
 	
+	public addOrgUnit(orgUnit:OrgUnit,parentID:number,office:Office):Observable<OrgUnit>{
+		let post = {};
+		let fields = ['name','code','type','location','defDoc','website'];
+		for(let i = 0; i < fields.length; i++){
+			if(orgUnit[fields[i]]) post[fields[i]] = orgUnit[fields[i]];
+		}
+		post['parentID'] = parentID;
+		post['useOffice'] = office.id;
+		return this.http.post<OrgUnit>(environment.hub.url+'org-unit',post,{headers: this.headers});
+	}
+	
 	
 }

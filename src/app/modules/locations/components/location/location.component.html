@@ -13,7 +13,7 @@
 			<li><label>Code:</label> <span>{{orgUnit.code}}</span></li>
 			<li><label>Name:</label> <span>{{orgUnit.name}}</span></li>
 			<li><label>Location:</label> <span>{{orgUnit.location}}</span></li>
-			<li><label>Type:</label> <span *ngIf="orgUnit.type!='Domain'">{{orgUnit.type}}</span><span *ngIf="orgUnit.type=='Domain'">Chapter</span></li>
+			<li><label>Type:</label><span>{{orgUnit.type}}</span></li>
 			<li><label>Website:</label> <span><a [href]="orgUnit.website" target="_blank">{{orgUnit.website}}</a></span></li>
 			<li *ngIf="orgUnit.parents && orgUnit.parents.length"><label>Parent Location:</label> <span><a [routerLink]="['/locations',orgUnit.parents[0].id]">{{orgUnit.parents[0].name}} ({{orgUnit.parents[0].code}})</a></span></li>
 		</ul>
@@ -47,7 +47,7 @@
 				<span><a [routerLink]="['/locations',childUnit.id]">{{childUnit.name}} ({{childUnit.code}})</a></span>
 			</li>
 		</ul>
-		<button type="button" class="btn btn-primary" *ngFor="let addOrg of canAddOrgs" (click)="addOrgModal(addorg)">Add {{addOrg}}</button>
+		<button type="button" class="btn btn-primary" *ngFor="let addOrgType of canAddOrgs" (click)="addOrgModal(addTemplate,addOrgType)">Add {{addOrgType}}</button>
 	</div>
 	<div><h1>Members</h1>
 		<span *ngIf="!orgUnit.users || orgUnit.users.length == 0">None!</span>
@@ -58,3 +58,22 @@
 		</ul>
 	</div>
 </ng-container>
+<ng-template #addTemplate>
+	<ng-container *ngIf="orgModel">
+		<div class="modal-header">
+			<h4 class="modal-title pull-left">Add New {{orgModel.type}}</h4>
+			<button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+			<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<label>Code:</label> <input type="text" [(ngModel)]="orgModel.code" required/><br/>
+			<label>Name:</label> <input type="text" [(ngModel)]="orgModel.name" required/><br/>
+			<label>Location:</label> <input type="text" [(ngModel)]="orgModel.location" required/><br/>
+			<label>Website:</label> <input type="text" [(ngModel)]="orgModel.website"/><br/>
+			<label>Description</label> <textarea [(ngModel)]="orgModel.defDoc"></textarea><br/>
+			<button type="button" class="btn btn-primary" (click)="addOrg()">Add</button>
+			<button type="button" class="btn btn-secondary" (click)="modalRef.hide()">Cancel</button>
+		</div>
+	</ng-container>
+</ng-template>
