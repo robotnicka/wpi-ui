@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 
 import { LocationListComponent } from './components/location-list/location-list.component';
 import { LocationComponent } from './components/location/location.component';
+import { LocationOfficerComponent } from './components/location-officer/location-officer.component';
 
 @NgModule({
 	imports: [
@@ -14,7 +15,7 @@ import { LocationComponent } from './components/location/location.component';
 			{
 				path: ':id',
 				component: LocationComponent
-			},
+			}
 		])
 	],
 	exports: [

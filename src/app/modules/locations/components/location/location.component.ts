@@ -8,13 +8,15 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { HubService} from 'app/modules/core/hub.service';
 import { Office, OrgUnit} from 'app/modules/core/models/';
+import { LocationOfficerComponent } from '../location-officer/location-officer.component';
 
 @Component({
 	selector: 'app-location',
 	templateUrl: './location.component.html'
 })
 export class LocationComponent implements OnInit, OnDestroy {
-	modalRef: BsModalRef;
+	addOrgModalRef: BsModalRef;
+	officerModalRef: BsModalRef;
 	orgSubscription: Subscription;
 	officeSubscription: Subscription;
 	orgUnit: OrgUnit;
@@ -88,7 +90,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 		this.orgModel = new OrgUnit();
 		this.orgModel.type = addOrgType;
 		console.log(this.orgModel);
-		this.modalRef = this.modalService.show(template);
+		this.addOrgModalRef = this.modalService.show(template);
 		//this.modalService.show(LocationAddModalComponent, {initialState});
 	}
 	addOrg(){
@@ -97,7 +99,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 			{
 				this.getOrg();
 				this.toastr.success('Location added!');
-				this.modalRef.hide();
+				this.addOrgModalRef.hide();
 			},
 			(error)=>{
 				let message = '';
@@ -127,4 +129,21 @@ export class LocationComponent implements OnInit, OnDestroy {
 		}
 		console.log('canAddOrgs',this.canAddOrgs);
 	}
+	officerModal(office){
+		const initialState = {
+			office: office
+		};
+		this.officerModalRef = this.modalService.show(LocationOfficerComponent, {initialState});
+	}
+	/*officerPermissions(office){
+		if(this.selectedOffice){
+			//we have both a selected office and officers for this unit, let's see what permissions we have over them.
+			this.orgUnit.offices.forEach(
+				function(office: Office){
+					this.hubService;
+				}	
+				
+			);
+		}else this.officeOfficerAuthority = null;
+	}*/
 }

@@ -75,6 +75,13 @@ export class HubService {
 			}
 		));
 	}
+	getOfficerAuthority(officeid: number){
+		return this.http.get(environment.hub.url+'office/verify/office/'+officeid,
+			{headers: this.headers,
+				params:{roles:Object.keys(this.officeRoles).join(',')}})
+				.pipe(map((response:any) => response.offices))
+				.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;});
+	}
 	
 	public getUser(id: any, options: any = {}):Observable<User>{
 		return this.http.get<User>(environment.hub.url+'user/'+id,{headers: this.headers, params: options});
