@@ -13,6 +13,7 @@ export class HubService {
 	headers: HttpHeaders;
 	private currentIdToken: BehaviorSubject<string> = new BehaviorSubject(null);
 	private currentUser: Observable<User>;
+	public currentUserId: number = -1;
 	public orgUnitTypes:string[] = [];
 	public officeRoles:Object = {};
 	constructor(private http: HttpClient, @Inject('cognitoMain') private cognitoMain: CognitoUtil) {
@@ -53,7 +54,7 @@ export class HubService {
 						return Observable.of(null);
 					}
 					else{
-						return this.getUser('me',{offices: 1});
+						return this.getUser('me',{offices: 1}).map((user) => { this.currentUserId = user.id; return user;});
 					}
 				}
 			));
@@ -138,8 +139,10 @@ export class HubService {
 			.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error')); 
 	}
 	
-	public assignOffice(officeid: number, userid: number): Observable<any>{
-		return this.http.put<any>(environment.hub.url+'office/'+officeid+'/assign/'+userid,{},{headers: this.headers});
+	public assignOffice(officeid: number, userid: number,officer:Office): Observable<any>{
+		let post = {'useOffice' : officer.id};
+
+		return this.http.put<any>(environment.hub.url+'office/'+officeid+'/assign/'+userid,post,{headers: this.headers});
 	}
 	
 	

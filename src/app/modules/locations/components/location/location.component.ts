@@ -35,6 +35,10 @@ export class LocationComponent implements OnInit, OnDestroy {
 
 	ngOnInit() {
 		this.getOrg();
+		this.getUserOffices();
+	}
+	getUserOffices(){
+		if(this.officeSubscription) this.officeSubscription.unsubscribe();
 		this.officeSubscription = this.route.params
 			.pipe(switchMap((params: Params) => {
 				return this.hubService.getOrgUnitAuthority(params['id']);
@@ -137,11 +141,14 @@ export class LocationComponent implements OnInit, OnDestroy {
 		};
 		this.officerModalRef = this.modalService.show(LocationOfficerComponent, {initialState});
 		this.officerModalSubscription = this.officerModalRef.content.action.subscribe(
-			(action:boolean) =>{
-				if(action){
+			(action:number) =>{
+				if(action > 0){ // I've updated an office
 					this.getOrg();
+					if(action == 2){ // I've just resigned from an office
+						this.getUserOffices();
+					}
 				}
-				else{
+				else{ // I've closed the office modal
 					this.officerModalSubscription.unsubscribe();
 				}
 			}

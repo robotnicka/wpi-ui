@@ -1,12 +1,14 @@
 <div *ngIf="office" class="modal-header">
 	<h4 class="modal-title">{{office.name}}</h4>
 	<div *ngIf="userOffices && userOffices.length">
-		<span>Viewing as office:</span>
 		<span *ngIf="userOffices.length==1 || editing">{{userOffices[0].name}}</span>
 		<select *ngIf="userOffices.length>1 && !editing" [(ngModel)]="selectedOffice">
 			<option *ngFor="let officeOption of userOffices" [ngValue]="officeOption">{{officeOption.name}}</option>
 		</select>
 	</div>
+	<button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+		<span aria-hidden="true">&times;</span>
+	</button>
 </div>
 <div *ngIf="office" class="modal-body">
 	<ul style="list-style-type: none;">
@@ -15,7 +17,8 @@
 		<span *ngIf="!office?.user?.membershipNumber">Vacant</span>
 		<span *ngIf="office?.user?.membershipNumber">
 			<a [routerLink]="['/members',office.user.id]">{{office.user.nickname}} ({{office.user.membershipNumber}})</a>
-			<button type="button" class="btn btn-primary" *ngIf="!editing && selectedOffice?.roles && selectedOffice.roles.indexOf('office_assign') !== -1" (click)="confirmModal(vacateConfirm)">Vacate</button>
+			<button type="button" class="btn btn-primary" *ngIf="!editing && this.hubService.currentUserId != office.user.id && selectedOffice?.roles && selectedOffice.roles.indexOf('office_assign') !== -1" (click)="confirmModal(vacateConfirm)">Vacate</button>
+			<button type="button" class="btn btn-primary" *ngIf="!editing && this.hubService.currentUserId == office.user.id" (click)="confirmModal(resignConfirm)">Resign</button>
 		</span>
 	</li>
 	<li *ngIf="office.email">Email: <a href="mailto:{{office.email}}">{{office.email}}</a></li>
@@ -26,6 +29,14 @@
   <div class="modal-body text-center" *ngIf="office.user">
     <p>Are you sure you want to remove {{office.user.nickname}} as {{office.name}} and vacate this position?</p>
     <button type="button" class="btn btn-default" (click)="vacateOffice()" >Yes</button>
+    <button type="button" class="btn btn-primary" (click)="confirmModalRef.hide()">No</button>
+  </div>
+</ng-template>
+
+<ng-template #resignConfirm>
+  <div class="modal-body text-center" *ngIf="office.user">
+    <p>Are you sure you want to resign from this position?</p>
+    <button type="button" class="btn btn-default" (click)="resignOffice()" >Yes</button>
     <button type="button" class="btn btn-primary" (click)="confirmModalRef.hide()">No</button>
   </div>
 </ng-template>
