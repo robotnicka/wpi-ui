@@ -133,5 +133,14 @@ export class HubService {
 		return this.http.post<OrgUnit>(environment.hub.url+'org-unit',post,{headers: this.headers});
 	}
 	
+	public getOffice(officeid: number): Observable<Office>{
+		return this.http.get<Office>(environment.hub.url+'office/'+officeid, {headers: this.headers} )
+			.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error')); 
+	}
+	
+	public assignOffice(officeid: number, userid: number): Observable<any>{
+		return this.http.put<any>(environment.hub.url+'office/'+officeid+'/assign/'+userid,{},{headers: this.headers});
+	}
+	
 	
 }

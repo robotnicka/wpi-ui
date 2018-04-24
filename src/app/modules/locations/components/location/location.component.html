@@ -63,7 +63,7 @@
 	<ng-container *ngIf="orgModel">
 		<div class="modal-header">
 			<h4 class="modal-title pull-left">Add New {{orgModel.type}}</h4>
-			<button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+			<button type="button" class="close pull-right" aria-label="Close" (click)="addOrgModalRef.hide()">
 			<span aria-hidden="true">&times;</span>
 			</button>
 		</div>
@@ -74,7 +74,7 @@
 			<label>Website:</label> <input type="text" [(ngModel)]="orgModel.website"/><br/>
 			<label>Description</label> <textarea [(ngModel)]="orgModel.defDoc"></textarea><br/>
 			<button type="button" class="btn btn-primary" (click)="addOrg()">Add</button>
-			<button type="button" class="btn btn-secondary" (click)="modalRef.hide()">Cancel</button>
+			<button type="button" class="btn btn-secondary" (click)="addOrgModalRef.hide()">Cancel</button>
 		</div>
 	</ng-container>
 </ng-template>

@@ -19,6 +19,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 	officerModalRef: BsModalRef;
 	orgSubscription: Subscription;
 	officeSubscription: Subscription;
+	officerModalSubscription: Subscription;
 	orgUnit: OrgUnit;
 	editOrgUnit: OrgUnit;
 	userOffices: Office[];
@@ -113,6 +114,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 	ngOnDestroy(){
 		this.orgSubscription.unsubscribe();
 		this.officeSubscription.unsubscribe();
+		if(this.officerModalSubscription) this.officerModalSubscription.unsubscribe();
 	}
 	officePermissions(office){
 		console.log('selected office', office);
@@ -134,6 +136,16 @@ export class LocationComponent implements OnInit, OnDestroy {
 			office: office
 		};
 		this.officerModalRef = this.modalService.show(LocationOfficerComponent, {initialState});
+		this.officerModalSubscription = this.officerModalRef.content.action.subscribe(
+			(action:boolean) =>{
+				if(action){
+					this.getOrg();
+				}
+				else{
+					this.officerModalSubscription.unsubscribe();
+				}
+			}
+		);
 	}
 	/*officerPermissions(office){
 		if(this.selectedOffice){

@@ -23,6 +23,7 @@ export class NavComponent implements OnInit {
 
 	public user: Object;
 	public hubUser: Object;
+	public hubResponse: boolean = false;
 	public showNav: Boolean = false;
 	private submenuItems:SubmenuItem[];
 	constructor(@Inject('cognitoMain') private cognitoMain: CognitoUtil, private hubService: HubService, private submenuService: SubmenuService) { }
@@ -47,7 +48,8 @@ export class NavComponent implements OnInit {
 				this.hubUser = user;
 				console.log(this.hubUser);
 			},
-			err => console.log(err)
+			err => console.log(err),
+			() => {this.hubResponse=true;}
 		);
 		
 		this.submenuService.getItems().subscribe(
