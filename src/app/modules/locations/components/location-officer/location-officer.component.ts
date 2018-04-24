@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Office, OrgUnit} from 'app/modules/core/models/';
 import { Subscription } from 'rxjs/Rx';
 import { HubService} from 'app/modules/core/hub.service';
@@ -7,7 +7,7 @@ import { HubService} from 'app/modules/core/hub.service';
 	selector: 'app-location-officer',
 	templateUrl: './location-officer.component.html'
 })
-export class LocationOfficerComponent implements OnInit, OnChanges, OnDestroy {
+export class LocationOfficerComponent implements OnInit, OnDestroy {
 	userOffices: Office[];
 	office: Office;
 	selectedOffice: Office;

@@ -170,9 +170,9 @@ export class CognitoUtil {
 
 	}
 
-	isAuthenticated() {
+	isAuthenticated(): Observable<LoginResponse> {
 		if(this.$loggedIn == null){
-			this.$loggedIn = new BehaviorSubject<LoginResponse>(null);
+			this.$loggedIn = new BehaviorSubject<LoginResponse>(new LoginResponse("Still authenticating the user", false));
 			let cognitoUser = this.getCurrentUser();
 	
 			if (cognitoUser != null) {
@@ -208,7 +208,7 @@ export class CognitoUtil {
 	
 	getUserSession(): Observable<CognitoUserSession>{
 		return this.isAuthenticated().pipe(map(
-			(response:LoginResponse|null)=>
+			(response:LoginResponse)=>
 			{
 				if(!response || !response.loggedIn) return null;
 				else return this.getCurrentUser();
