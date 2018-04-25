@@ -6,7 +6,7 @@ import { map, switchMap } from 'rxjs/operators';
 import 'rxjs/add/observable/of';
 import { environment } from 'environments/environment';
 import {CognitoUtil} from "app/modules/core/cognito.service";
-import { User, Office, OrgUnit, OrgUnitSearch } from './models/';
+import { User, Office, OrgUnit, OrgUnitSearch, UserSearch } from './models/';
 
 @Injectable()
 export class HubService {
@@ -86,6 +86,18 @@ export class HubService {
 	
 	public getUser(id: any, options: any = {}):Observable<User>{
 		return this.http.get<User>(environment.hub.url+'user/'+id,{headers: this.headers, params: options});
+	}
+	
+	public getUsers(search: UserSearch): Observable<User[]>{
+		let searchParams = new HttpParams({fromObject: search as any});
+		console.log('getOrgUnits');
+		console.log(searchParams);
+		console.log(searchParams.toString());
+		console.log(searchParams.toString().length);
+		return this.http.get<OrgUnit[]>(environment.hub.url+'user', 
+										{headers: this.headers, params: searchParams} )
+					.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error'));
+	
 	}
 	
 	public getOrgUnits(search: OrgUnitSearch): Observable<OrgUnit[]>{

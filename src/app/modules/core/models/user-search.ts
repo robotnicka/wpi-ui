@@ -1,4 +1,4 @@
-export class MemberSearch {
+export class UserSearch {
   name: string;
   email: string;
   membershipNumber: string;
