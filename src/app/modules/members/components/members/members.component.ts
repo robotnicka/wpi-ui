@@ -8,12 +8,16 @@ import { UserSearch, User} from 'app/modules/core/models/';
 	templateUrl: './members.component.html'
 })
 export class MembersComponent implements OnInit, OnDestroy {
+	membershipTypeOptions: string[];
 	searchParams: UserSearch;
 	userSearchCriteria: BehaviorSubject<UserSearch>;
 	searchSubscription: Subscription;
 	users: User[];
 	constructor( private hubService: HubService) {
 		this.searchParams  = new UserSearch();
+		
+		this.membershipTypeOptions = ['Any','None','Full','Suspended','Resigned','Expelled'];
+		this.searchParams.type=this.membershipTypeOptions[0];
 		this.userSearchCriteria = new BehaviorSubject(this.searchParams);
 	}
 
@@ -25,6 +29,10 @@ export class MembersComponent implements OnInit, OnDestroy {
 		)).subscribe(
 			(users:User[]) => { this.users = users}  
 		);
+	}
+	
+	search(){
+		this.userSearchCriteria.next(this.searchParams);
 	}
 	
 	ngOnDestroy(){

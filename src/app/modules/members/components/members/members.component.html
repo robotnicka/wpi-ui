@@ -1,3 +1,17 @@
-<p>
-  user works!
-</p>
+<ul style="list-style-type: none;" *ngIf="users && users.length">
+	<li *ngFor="let member of users">
+		<span><a [routerLink]="['/members',member.id]">{{member.nickname}} <ng-container *ngIf="member.membershipNumber">({{member.membershipNumber}})</ng-container><ng-container *ngIf="!member.membershipNumber">(Non-Member)</ng-container></a></span>
+	</li>
+</ul>
+<span *ngIf="!users || !users.length">No members found for search</span>
+<div>
+<h2>Search</h2>	
+<label>Name</label> <input type="text" [(ngModel)]="searchParams.name"/><br/>
+<label>Email</label> <input type="text" [(ngModel)]="searchParams.email"/><br/>
+<label>Member Number</label> <input type="text" [(ngModel)]="searchParams.membershipNumber"/><br/>
+<label>Membership Type</label> 
+	<select [(ngModel)]="searchParams.type">
+		<option *ngFor="let membertype of membershipTypeOptions" [ngValue]="membertype">{{membertype}}</option>
+	</select><br/>
+<button type="button" class="btn btn-primary" (click)="search()">Search</button>
+</div>

@@ -89,7 +89,9 @@ export class HubService {
 	}
 	
 	public getUsers(search: UserSearch): Observable<User[]>{
+		
 		let searchParams = new HttpParams({fromObject: search as any});
+		if(search.type=='Any') searchParams = searchParams.delete('type');
 		console.log('getOrgUnits');
 		console.log(searchParams);
 		console.log(searchParams.toString());
