@@ -21,7 +21,7 @@ export class LocationListItemComponent implements OnInit {
 			this.fetchedOrgUnit=this.orgUnit;
 			this.children = this.orgUnit.children;
 		}
-		if(this.expanded==false) this.toggle();
+		if(this.expanded==false && (this.orgUnit.type=='Nation'||this.orgUnit.type=='Region')) this.toggle();
 	}
 	toggle(){
 		if(!this.fetchedOrgUnit){
