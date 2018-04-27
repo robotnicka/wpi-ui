@@ -20,7 +20,8 @@
       "prefix": "app",
       "styles": [
         "styles.scss",
-        "../node_modules/ngx-toastr/toastr.css"
+        "../node_modules/ngx-toastr/toastr.css",
+        "../node_modules/@ng-select/ng-select/themes/default.theme.css"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",

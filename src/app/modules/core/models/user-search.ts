@@ -3,6 +3,7 @@ export class UserSearch {
   email: string;
   membershipNumber: string;
   type: string;
+  orgUnit: number;
   limit: number;
   offset: number;
 }

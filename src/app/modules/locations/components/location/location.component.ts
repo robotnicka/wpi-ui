@@ -137,7 +137,8 @@ export class LocationComponent implements OnInit, OnDestroy {
 	}
 	officerModal(office){
 		const initialState = {
-			office: office
+			office: office,
+			orgUnit: this.orgUnit
 		};
 		this.officerModalRef = this.modalService.show(LocationOfficerComponent, {initialState});
 		this.officerModalSubscription = this.officerModalRef.content.action.subscribe(

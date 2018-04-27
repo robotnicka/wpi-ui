@@ -19,7 +19,7 @@ import { NavComponent} from './nav/nav.component';
 		CoreModule,
 		SidebarModule.forRoot(),
 		BrowserAnimationsModule, // required animations module
-		ToastrModule.forRoot(), // ToastrModule added
+		ToastrModule.forRoot() // ToastrModule added
 	],
 	exports: [ ],
 	providers: [],

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, TemplateRef, EventEmitter, Output } from '@angular/core';
-import { Office, OrgUnit} from 'app/modules/core/models/';
+import { Office, OrgUnit, User} from 'app/modules/core/models/';
 import { Subscription } from 'rxjs/Rx';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
@@ -13,12 +13,17 @@ import { HubService} from 'app/modules/core/hub.service';
 export class LocationOfficerComponent implements OnInit, OnDestroy {
 	@Output() action = new EventEmitter();
 	confirmModalRef: BsModalRef;
+	hireModalRef: BsModalRef;
+	isHiring: boolean = false;
 	userOffices: Office[];
+	orgUnit: OrgUnit;
 	office: Office;
-	selectedOffice: Office;
+	selectedOffice: Office
+	selectedHireMember: User = null;
 	officeSubscription: Subscription;
 	constructor(public bsModalRef: BsModalRef, private modalService: BsModalService, private toastr: ToastrService, private hubService: HubService) { }
 	ngOnInit() {
+		console.log('location-officer-location', this.orgUnit);
 		this.loadPermissions();
 	}
 	loadOffice(){
@@ -63,6 +68,34 @@ export class LocationOfficerComponent implements OnInit, OnDestroy {
 	}
 	confirmModal(template: TemplateRef<any>) {
 		this.confirmModalRef = this.modalService.show(template, {class: 'modal-sm'});
+	}
+	
+	hireModal(template: TemplateRef<any>) {
+		this.isHiring = true;
+		this.hireModalRef = this.modalService.show(template);
+	}
+	doneHiring(){
+		this.hireModalRef.hide();
+		this.isHiring = false;
+	}
+	
+	hireOffice(){
+		this.hubService.assignOffice(this.office.id,this.selectedHireMember.id,this.selectedOffice).subscribe(
+			(response:any)=>
+			{
+				this.toastr.success('Officer hired!');
+				this.loadOffice();
+				this.action.emit(1);
+				this.doneHiring();
+			},
+			(error)=>{
+				let message = '';
+				if(error.error && error.error.message) message = error.error.message;
+				else if(error.message) message = error.message;
+				else message='Unknown server error';
+				this.toastr.error(message);
+			}
+		);
 	}
 	
 	vacateOffice(){

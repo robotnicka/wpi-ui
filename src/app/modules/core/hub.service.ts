@@ -104,6 +104,7 @@ export class HubService {
 	
 	public getOrgUnits(search: OrgUnitSearch): Observable<OrgUnit[]>{
 		let searchParams = new HttpParams({fromObject: search as any});
+		if(search.types && search.types.length) searchParams = searchParams.set('types',search.types.join(','));
 		console.log('getOrgUnits');
 		console.log(searchParams);
 		console.log(searchParams.toString());
