@@ -25,6 +25,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 	userOffices: Office[];
 	selectedOffice: Office;
 	canAddOrgs: string[];
+	canTransferMember: boolean = false;
 	orgModel: OrgUnit;
 	editing: boolean = false;
 	constructor(private hubService: HubService,
@@ -123,6 +124,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 	officePermissions(office){
 		console.log('selected office', office);
 		this.canAddOrgs = [];
+		this.canTransferMember = false;
 		if(!office || !office.roles || !office.roles.length) return;
 		let types = this.hubService.orgUnitTypes;
 		let currentOrgTypeIndex = types.indexOf(this.orgUnit.type);
@@ -132,6 +134,13 @@ export class LocationComponent implements OnInit, OnDestroy {
 					this.canAddOrgs.push(types[i]); //if this officer has permissions to create this unit type, add to list of units we can add here
 				}
 			}
+		}
+
+		if(this.orgUnit.type!='Venue' //not transferring members in or out of Venues
+			&& office.roles.indexOf('user_assign') != -1 && //Do we have the appropriate permission?
+			//Is our office part of a parent for this org unit, or is this org unit higher than chapter?
+			(office.parentOrgID != this.orgUnit.id || this.orgUnit.type!='Chapter')){
+			this.canTransferMember=true;
 		}
 		console.log('canAddOrgs',this.canAddOrgs);
 	}

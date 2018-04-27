@@ -18,7 +18,7 @@
 			<button type="button" class="btn btn-primary" *ngIf="!editing && selectedOffice?.roles && selectedOffice.roles.indexOf('office_assign') !== -1" (click)="hireModal(hireSelect)">Hire</button>
 		</span>
 		<span *ngIf="office?.user?.membershipNumber">
-			<a [routerLink]="['/members',office.user.id]">{{office.user.nickname}} ({{office.user.membershipNumber}})</a>
+			<a [routerLink]="['/members',office.user.id]">{{office.user.nickname}} ({{office.user.membershipNumber}})</a><br/>
 			<button type="button" class="btn btn-primary" *ngIf="!editing && this.hubService.currentUserId != office.user.id && selectedOffice?.roles && selectedOffice.roles.indexOf('office_assign') !== -1" (click)="confirmModal(vacateConfirm)">Vacate</button>
 			<button type="button" class="btn btn-primary" *ngIf="!editing && this.hubService.currentUserId == office.user.id" (click)="confirmModal(resignConfirm)">Resign</button>
 			<button type="button" class="btn btn-primary" *ngIf="!editing && selectedOffice?.roles && selectedOffice.roles.indexOf('office_assign') !== -1" (click)="hireModal(hireSelect)">Replace</button>
@@ -54,7 +54,7 @@
 	<div class="modal-body">
 		<app-member-search defaultType="Full" [defaultOrgUnit]="orgUnit" [disabledTypes]="['None','Resigned','Expelled']" (selectedMember)="selectedHireMember=$event" *ngIf="isHiring"></app-member-search>
 		
-		<div *ngIf="selectedHireMember">
+		<div *ngIf="selectedHireMember" class="text-center">
 			<p>Are you sure you want to hire {{selectedHireMember.nickname}} for this position?</p>
 			<button type="button" class="btn btn-default" (click)="hireOffice()" >Yes</button>
 			<button type="button" class="btn btn-primary" (click)="doneHiring()">No</button>

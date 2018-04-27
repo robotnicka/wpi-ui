@@ -18,7 +18,7 @@ export class PasswordComponent implements OnInit,OnDestroy {
 	extraAttributes: any;
 	loggedIn: boolean = false;
 	loggedInSub: Subscription;
-	constructor(@Inject('cognitoMain') private cognitoMain: CognitoUtil, public router: Router) {
+	constructor(@Inject('cognitoMain') public cognitoMain: CognitoUtil, public router: Router) {
 		this.registrationUser = new NewPasswordUser();
 		this.errorMessage = null;
 		this.extraAttributes = {};

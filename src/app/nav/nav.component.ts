@@ -25,7 +25,7 @@ export class NavComponent implements OnInit {
 	public hubUser: Object;
 	public hubResponse: boolean = false;
 	public showNav: Boolean = false;
-	private submenuItems:SubmenuItem[];
+	public submenuItems:SubmenuItem[];
 	constructor(@Inject('cognitoMain') private cognitoMain: CognitoUtil, private hubService: HubService, private submenuService: SubmenuService) { }
 	
 	ngOnInit() {
