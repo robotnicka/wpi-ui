@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { HubService} from 'app/modules/core/hub.service';
-import { Office, OrgUnit} from 'app/modules/core/models/';
+import { Office, OrgUnit, User} from 'app/modules/core/models/';
 import { LocationOfficerComponent } from '../location-officer/location-officer.component';
 
 @Component({
@@ -26,6 +26,8 @@ export class LocationComponent implements OnInit, OnDestroy {
 	selectedOffice: Office;
 	canAddOrgs: string[];
 	canTransferMember: boolean = false;
+	isTransferring: boolean = false;
+	transferringMember: User;
 	orgModel: OrgUnit;
 	editing: boolean = false;
 	constructor(private hubService: HubService,
@@ -164,6 +166,19 @@ export class LocationComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
+	
+	transferModal(template, member){
+		this.transferringMember = member;
+		this.isTransferring = true;
+		this.officerModalRef = this.modalService.show(template);
+	}
+	
+	doneTransfer(result:boolean){
+		this.officerModalRef.hide();
+		this.isTransferring = false;
+		if(result) this.getOrg();
+	}
+	
 	/*officerPermissions(office){
 		if(this.selectedOffice){
 			//we have both a selected office and officers for this unit, let's see what permissions we have over them.

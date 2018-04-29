@@ -55,7 +55,7 @@
 		<ul style="list-style-type: none;" *ngIf="orgUnit.users.length">
 			<li *ngFor="let member of orgUnit.users">
 				<span><a [routerLink]="['/members',member.id]">{{member.nickname}} ({{member.membershipNumber}})</a></span>
-				<button type="button" class="btn btn-primary" *ngIf="selectedOffice && canTransferMember" (click)="transferModal(member)">Transfer</button>
+				<button type="button" class="btn btn-primary" *ngIf="selectedOffice && canTransferMember" (click)="transferModal(transferTemplate, member)">Transfer</button>
 			</li>
 		</ul>
 	</div>
@@ -78,4 +78,15 @@
 			<button type="button" class="btn btn-secondary" (click)="addOrgModalRef.hide()">Cancel</button>
 		</div>
 	</ng-container>
+</ng-template>
+<ng-template #transferTemplate>
+	<div class="modal-header" *ngIf="transferringMember">
+		<h4 class="modal-title pull-left">Transfer {{transferringMember.nickname}}</h4>
+		<button type="button" class="close pull-right" aria-label="Close" (click)="doneTransfer()">
+		<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body" *ngIf="transferringMember">
+		<app-member-transfer *ngIf="isTransferring" [member]="transferringMember" [officer]="selectedOffice" (result)="doneTransfer($event)"></app-member-transfer>
+	</div>
 </ng-template>

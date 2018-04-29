@@ -1,6 +1,7 @@
 export class OrgUnitSearch {
   type: string;
   types: string[];
+  parent: number;
   code: string;
   name: string;
   limit: number;

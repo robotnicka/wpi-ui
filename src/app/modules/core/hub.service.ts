@@ -160,5 +160,11 @@ export class HubService {
 		return this.http.put<any>(environment.hub.url+'office/'+officeid+'/assign/'+userid,post,{headers: this.headers});
 	}
 	
+	public assignMember(userid: number, orgunitid: number,officer:Office): Observable<any>{
+		let post = {'useOffice' : officer.id};
+
+		return this.http.put<any>(environment.hub.url+'user/'+userid+'/assign/'+orgunitid,post,{headers: this.headers});
+	}
+	
 	
 }
