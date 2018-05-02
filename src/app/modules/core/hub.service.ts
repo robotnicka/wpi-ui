@@ -84,6 +84,14 @@ export class HubService {
 				.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;});
 	}
 	
+	getUserAuthority(userid: number){
+		return this.http.get(environment.hub.url+'office/verify/user/'+userid,
+			{headers: this.headers,
+				params:{roles:Object.keys(this.officeRoles).join(',')}})
+				.pipe(map((response:any) => response.offices))
+				.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;});
+	}
+	
 	public getUser(id: any, options: any = {}):Observable<User>{
 		return this.http.get<User>(environment.hub.url+'user/'+id,{headers: this.headers, params: options});
 	}
@@ -158,6 +166,32 @@ export class HubService {
 		let post = {'useOffice' : officer.id};
 
 		return this.http.put<any>(environment.hub.url+'office/'+officeid+'/assign/'+userid,post,{headers: this.headers});
+	}
+	
+	public updateOffice(updateOffice:Office,office:Office):Observable<Office>{
+		let post = {};
+		let fields = ['name','email','roles'];
+		for(let i = 0; i < fields.length; i++){
+			if(updateOffice[fields[i]]) post[fields[i]] = updateOffice[fields[i]];
+		}
+		post['useOffice'] = office.id;
+		return this.http.put<Office>(environment.hub.url+'office/'+updateOffice.id,post,{headers: this.headers});
+	}
+	
+	public addAssistantOffice(addOffice:Office,office:Office):Observable<Office>{
+		let post = {};
+		let fields = ['name','email','roles'];
+		for(let i = 0; i < fields.length; i++){
+			if(addOffice[fields[i]]) post[fields[i]] = addOffice[fields[i]];
+		}
+		post['useOffice'] = office.id;
+		return this.http.post<Office>(environment.hub.url+'office/'+addOffice.parentOfficeID+"/assistant",post,{headers: this.headers});
+	}
+	
+	public deleteAssistantOffice(officeid: number,officer:Office): Observable<any>{
+		let post: any = {'useOffice' : officer.id};
+
+		return this.http.delete<any>(environment.hub.url+'office/'+officeid+'/assistant',{headers: this.headers, params: post});
 	}
 	
 	public assignMember(userid: number, orgunitid: number,officer:Office): Observable<any>{

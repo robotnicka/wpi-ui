@@ -1,8 +1,8 @@
 <div *ngIf="office" class="modal-header">
 	<h4 class="modal-title">{{office.name}}</h4>
 	<div *ngIf="userOffices && userOffices.length">
-		<span *ngIf="userOffices.length==1 || editing">{{userOffices[0].name}}</span>
-		<select *ngIf="userOffices.length>1 && !editing" [(ngModel)]="selectedOffice">
+		<span *ngIf="userOffices.length==1 || editing">Viewing As: {{userOffices[0].name}}</span>
+		<select *ngIf="userOffices.length>1" [(ngModel)]="selectedOffice">
 			<option *ngFor="let officeOption of userOffices" [ngValue]="officeOption">{{officeOption.name}}</option>
 		</select>
 	</div>
@@ -13,19 +13,35 @@
 <div *ngIf="office" class="modal-body">
 	<ul style="list-style-type: none;">
 	<li>{{office.name}} ({{office.type}})</li>
+	<li *ngIf="primaryOffice">Assistant to: {{primaryOffice.name}} ({{primaryOffice.type}})</li>
 	<li>Held by:
 		<span *ngIf="!office?.user?.membershipNumber">Vacant
-			<button type="button" class="btn btn-primary" *ngIf="!editing && selectedOffice?.roles && selectedOffice.roles.indexOf('office_assign') !== -1" (click)="hireModal(hireSelect)">Hire</button>
+			<button type="button" class="btn btn-primary" 	*ngIf="selectedOffice?.roles &&
+					(selectedOffice.roles.indexOf('office_assign') !== -1 || (selectedOffice.id == office.parentOfficeID && selectedOffice.roles.indexOf('office_create_own_assistants') !== -1))"
+																																							(click)="hireModal(hireSelect)">Hire</button>
 		</span>
 		<span *ngIf="office?.user?.membershipNumber">
 			<a [routerLink]="['/members',office.user.id]">{{office.user.nickname}} ({{office.user.membershipNumber}})</a><br/>
-			<button type="button" class="btn btn-primary" *ngIf="!editing && this.hubService.currentUserId != office.user.id && selectedOffice?.roles && selectedOffice.roles.indexOf('office_assign') !== -1" (click)="confirmModal(vacateConfirm)">Vacate</button>
-			<button type="button" class="btn btn-primary" *ngIf="!editing && this.hubService.currentUserId == office.user.id" (click)="confirmModal(resignConfirm)">Resign</button>
-			<button type="button" class="btn btn-primary" *ngIf="!editing && selectedOffice?.roles && selectedOffice.roles.indexOf('office_assign') !== -1" (click)="hireModal(hireSelect)">Replace</button>
+			<button type="button" class="btn btn-primary" 	*ngIf="selectedOffice?.roles &&
+					(selectedOffice.roles.indexOf('office_assign') !== -1 || (selectedOffice.id == office.parentOfficeID && selectedOffice.roles.indexOf('office_create_own_assistants') !== -1))"
+																																							(click)="confirmModal(vacateConfirm)">Vacate</button>
+			<button type="button" class="btn btn-primary" *ngIf="this.hubService.currentUserId == office.user.id" (click)="confirmModal(resignConfirm)">Resign</button>
+			<button type="button" class="btn btn-primary" 	*ngIf="selectedOffice?.roles &&
+					(selectedOffice.roles.indexOf('office_assign') !== -1 || (selectedOffice.id == office.parentOfficeID && selectedOffice.roles.indexOf('office_create_own_assistants') !== -1))"
+																																							(click)="hireModal(hireSelect)">Replace</button>
 		</span>
 	</li>
 	<li *ngIf="office.email">Email: <a href="mailto:{{office.email}}">{{office.email}}</a></li>
 	</ul>
+	<button type="button" class="btn btn-primary" *ngIf="selectedOffice?.roles && selectedOffice.roles.indexOf('office_update') !== -1" (click)="editOffice(editTemplate)">Edit</button>
+	<button type="button" class="btn btn-primary"
+		*ngIf="selectedOffice?.roles &&
+					(selectedOffice.roles.indexOf('office_create_assistants') !== -1 || (selectedOffice.id == office.id && selectedOffice.roles.indexOf('office_create_own_assistants') !== -1))"
+																																		(click)="addAssistant(assistantTemplate)">Add Assistant</button>
+	<button type="button" class="btn btn-primary"
+		*ngIf="selectedOffice?.roles && office.parentOfficeID &&
+					(selectedOffice.roles.indexOf('office_create_assistants') !== -1 || (selectedOffice.id == office.parentOfficeID && selectedOffice.roles.indexOf('office_create_own_assistants') !== -1))"
+																																		(click)="confirmModal(deleteAssistantConfirm)">Delete Assistant</button>
 </div>
 
 <ng-template #vacateConfirm>
@@ -59,5 +75,37 @@
 			<button type="button" class="btn btn-default" (click)="hireOffice()" >Yes</button>
 			<button type="button" class="btn btn-primary" (click)="doneHiring()">No</button>
 		</div>
+	</div>
+</ng-template>
+
+<ng-template #editTemplate>
+	<div *ngIf="office" class="modal-header">
+		<h4 class="modal-title">Editing {{office.name}}</h4>
+		<button type="button" class="close pull-right" aria-label="Close" (click)="doneEdit()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body" *ngIf="office && isEditing">
+		<app-office-form [office]="office" [officeAuthority]="selectedOffice" (officeResult)="editResult($event)"></app-office-form>
+	</div>
+</ng-template>
+
+<ng-template #assistantTemplate>
+	<div *ngIf="office" class="modal-header">
+		<h4 class="modal-title">Adding assistant for {{office.name}}</h4>
+		<button type="button" class="close pull-right" aria-label="Close" (click)="doneEdit()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body" *ngIf="office && isAdding">
+		<app-office-form [primaryOffice]="office" [officeAuthority]="selectedOffice" (officeResult)="addAssistantResult($event)"></app-office-form>
+	</div>
+</ng-template>
+
+<ng-template #deleteAssistantConfirm>
+	<div class="modal-body text-center">
+		<p>Are you sure you want to delete position {{office.name}}?</p>
+		<button type="button" class="btn btn-default" (click)="deleteAssistant()" >Yes</button>
+		<button type="button" class="btn btn-primary" (click)="confirmModalRef.hide()">No</button>
 	</div>
 </ng-template>

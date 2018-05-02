@@ -147,16 +147,30 @@ export class LocationComponent implements OnInit, OnDestroy {
 		console.log('canAddOrgs',this.canAddOrgs);
 	}
 	officerModal(office){
-		const initialState = {
+		let initialState = {
 			office: office,
-			orgUnit: this.orgUnit
+			orgUnit: this.orgUnit,
+			primaryOffice:null
 		};
+		if(office.parentOfficeID){
+			//This is an assistant. We need to pass the primary office as well
+			for(let i = 0; i < this.orgUnit.offices.length; i++){
+				if(this.orgUnit.offices[i].id == office.parentOfficeID){
+					initialState.primaryOffice = this.orgUnit.offices[i];
+					break;
+				}
+			}
+			if(!initialState.primaryOffice){
+				this.toastr.error('Unable to find primary office for assistant!');
+				return;
+			}
+		}
 		this.officerModalRef = this.modalService.show(LocationOfficerComponent, {initialState});
 		this.officerModalSubscription = this.officerModalRef.content.action.subscribe(
 			(action:number) =>{
 				if(action > 0){ // I've updated an office
 					this.getOrg();
-					if(action == 2){ // I've just resigned from an office
+					if(action == 2){ // I've just updated an office
 						this.getUserOffices();
 					}
 				}

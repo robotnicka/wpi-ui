@@ -14,12 +14,17 @@ export class LocationOfficerComponent implements OnInit, OnDestroy {
 	@Output() action = new EventEmitter();
 	confirmModalRef: BsModalRef;
 	hireModalRef: BsModalRef;
+	editModalRef: BsModalRef;
 	isHiring: boolean = false;
+	isEditing: boolean = false;
+	isAdding: boolean = false;
 	userOffices: Office[];
 	orgUnit: OrgUnit;
 	office: Office;
+	primaryOffice: Office;
 	selectedOffice: Office
 	selectedHireMember: User = null;
+
 	officeSubscription: Subscription;
 	constructor(public bsModalRef: BsModalRef, private modalService: BsModalService, private toastr: ToastrService, private hubService: HubService) { }
 	ngOnInit() {
@@ -30,6 +35,7 @@ export class LocationOfficerComponent implements OnInit, OnDestroy {
 		this.hubService.getOffice(this.office.id).subscribe(
 			(office:Office) =>
 			{
+				if(office.parentOffice) office.parentOfficeID = office.parentOffice.id;
 				this.office = office;
 			}
 		);
@@ -84,6 +90,7 @@ export class LocationOfficerComponent implements OnInit, OnDestroy {
 			(response:any)=>
 			{
 				this.toastr.success('Officer hired!');
+				console.log('Officer hired');
 				this.loadOffice();
 				this.action.emit(1);
 				this.doneHiring();
@@ -126,6 +133,93 @@ export class LocationOfficerComponent implements OnInit, OnDestroy {
 				this.action.emit(2);
 				this.confirmModalRef.hide();
 				this.bsModalRef.hide();
+			},
+			(error)=>{
+				let message = '';
+				if(error.error && error.error.message) message = error.error.message;
+				else if(error.message) message = error.message;
+				else message='Unknown server error';
+				this.toastr.error(message);
+			}
+		);
+	}
+	
+	editOffice(template: TemplateRef<any>){
+		this.isEditing = true;
+		this.editModalRef = this.modalService.show(template);
+	}
+	
+	editResult(resultOffice: Office){
+		if(resultOffice == null){
+			this.doneEdit();
+			return;
+		}
+		console.log(resultOffice);
+		this.hubService.updateOffice(resultOffice,this.selectedOffice).subscribe(
+			(response:any)=>
+			{
+				this.toastr.success('Office updated');
+				this.loadOffice();
+				this.action.emit(2);
+				this.doneEdit();
+			},
+			(error)=>{
+				let message = '';
+				if(error.error && error.error.message) message = error.error.message;
+				else if(error.message) message = error.message;
+				else message='Unknown server error';
+				this.toastr.error(message);
+			}
+		);
+	}
+	
+	doneEdit(){
+		this.editModalRef.hide();
+		this.isEditing = false;
+	}
+	
+	addAssistant(template: TemplateRef<any>){
+		this.isAdding = true;
+		this.editModalRef = this.modalService.show(template);
+	}
+	
+	addAssistantResult(resultOffice: Office){
+		if(resultOffice == null){
+			this.doneAddAssistant();
+			return;
+		}
+		console.log(resultOffice);
+		this.hubService.addAssistantOffice(resultOffice,this.selectedOffice).subscribe(
+			(response:any)=>
+			{
+				this.toastr.success('Assistant Added');
+				this.loadOffice();
+				this.action.emit(2);
+				this.doneAddAssistant();
+			},
+			(error)=>{
+				let message = '';
+				if(error.error && error.error.message) message = error.error.message;
+				else if(error.message) message = error.message;
+				else message='Unknown server error';
+				this.toastr.error(message);
+			}
+		);
+	}
+	
+	doneAddAssistant(){
+		this.editModalRef.hide();
+		this.isAdding = false;
+	}
+	
+	deleteAssistant(){
+		this.hubService.deleteAssistantOffice(this.office.id,this.selectedOffice).subscribe(
+			(response:any)=>
+			{
+				this.toastr.success('Office Deleted');
+				this.confirmModalRef.hide();
+				this.bsModalRef.hide();
+				this.action.emit(2);
 			},
 			(error)=>{
 				let message = '';

@@ -8,6 +8,7 @@ import { LocationListComponent } from './components/location-list/location-list.
 import { LocationListItemComponent } from './components/location-list-item/location-list-item.component';
 import { LocationComponent } from './components/location/location.component';
 import { LocationOfficerComponent } from './components/location-officer/location-officer.component';
+import { OfficeFormComponent } from './components/office-form/office-form.component';
 
 @NgModule({
   imports: [
@@ -17,7 +18,7 @@ import { LocationOfficerComponent } from './components/location-officer/location
     SharedModule,
     LocationsRoutingModule
   ],
-  declarations: [LocationListComponent, LocationListItemComponent, LocationComponent, LocationOfficerComponent],
+  declarations: [LocationListComponent, LocationListItemComponent, LocationComponent, LocationOfficerComponent, OfficeFormComponent],
   entryComponents: [LocationOfficerComponent]
 })
 export class LocationsModule { }

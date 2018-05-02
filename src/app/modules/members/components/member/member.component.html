@@ -1,4 +1,11 @@
 <ng-container *ngIf="member">
+	<div *ngIf="userOffices && userOffices.length">
+		<span>Viewing as office:</span>
+		<span *ngIf="userOffices.length==1 || editing">{{userOffices[0].name}}</span>
+		<select *ngIf="userOffices.length>1 && !editing" [(ngModel)]="selectedOffice" (change)="officePermissions(selectedOffice)">
+			<option *ngFor="let officeOption of userOffices" [ngValue]="officeOption">{{officeOption.name}}</option>
+		</select>
+	</div>
 	<h1>{{member.nickname}}</h1>
 	<ul style="list-style-type: none;" *ngIf="!editing">
 		<li><label>Name:</label> <span>{{member.nickname}}</span></li>
@@ -10,6 +17,7 @@
 			<span *ngIf="member.orgUnit"><a [routerLink]="['/locations',member.orgUnit.id]">{{member.orgUnit.name}} ({{member.orgUnit.code}})</a></span>
 		</li>
 	</ul>
+	<button type="button" class="btn btn-primary" *ngIf="selectedOffice?.roles && selectedOffice.roles.indexOf('user_assign') !== -1" (click)="transferModal(transferTemplate)">Transfer</button>
 	<div *ngIf="editing">
 		
 	</div>
@@ -21,4 +29,15 @@
 			</li>
 		</ul>
 	</div>
+	<ng-template #transferTemplate>
+	<div class="modal-header">
+		<h4 class="modal-title pull-left">Transfer {{member.nickname}}</h4>
+		<button type="button" class="close pull-right" aria-label="Close" (click)="doneTransfer()">
+		<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="modal-body">
+		<app-member-transfer *ngIf="isTransferring" [member]="member" [officer]="selectedOffice" (result)="doneTransfer($event)"></app-member-transfer>
+	</div>
+</ng-template>
 </ng-container>

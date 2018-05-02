@@ -4,7 +4,9 @@ export class Office {
   name:string;
   id: number;
   parentOfficeID: number;
+  parentOffice: Office;
   parentOrgID: number;
+  userID: number;
   unit: OrgUnit;
   roles: string[];
 }
