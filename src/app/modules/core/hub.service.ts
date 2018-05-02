@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import { map, switchMap, retryWhen, delayWhen } from 'rxjs/operators';
+import { map, switchMap, first } from 'rxjs/operators';
 import 'rxjs/add/observable/of';
 
 import { environment } from 'environments/environment';
@@ -38,7 +38,7 @@ export class HubService {
 	}
 	
 	checkIdToken(): Observable<string>{
-		return this.cognitoMain.getIdToken()
+		return this.cognitoMain.getIdToken().first()
 			.map((idToken) => {
 				if(idToken && idToken != this.idToken){
 					console.log('id token has changed');

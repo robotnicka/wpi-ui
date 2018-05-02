@@ -18,6 +18,8 @@ export class AppComponent implements OnInit, OnDestroy {
 				this.loggedIn = response.loggedIn;
 			}
 		);
+		
+	
 	}
 	
 	ngOnDestroy() {
