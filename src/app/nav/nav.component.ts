@@ -65,6 +65,7 @@ export class NavComponent implements OnInit {
 	}
 	
 	ngAfterViewInit(){
+		//scroll to the top of new pages, and save scrolling details so the back button works correctly
 		this.location.subscribe((ev:PopStateEvent) => {
 			this.lastPoppedUrl = ev.url;
 		});
@@ -74,31 +75,27 @@ export class NavComponent implements OnInit {
 		.subscribe((ev: NavigationStart | NavigationEnd) => {
 			let scrollheight = 0;
 			const contentContainer = document.querySelector('.ng-sidebar__content');
+			let evstring = ev.toString();
+			//Checking NavigationEnd first because typescript doesn't work very well with instanceof right now, and NavigationEnd contains the properties of NavigationStart
 			if (ev instanceof NavigationEnd) {
-				console.log('ev.url', ev.url);
-				console.log('last popped url', this.lastPoppedUrl);
 				if (ev.url == this.lastPoppedUrl) {
 					this.lastPoppedUrl = undefined;
 					scrollheight = this.yScrollStack.pop();
-					console.log('stack scrollheight', scrollheight);
 				} else{
 					scrollheight = 0;
 				}
-				console.log('scrolling to ',scrollheight);
 				contentContainer.scrollTo(0, scrollheight);
 			}
 			else if (ev instanceof NavigationStart) {
-				if (ev.url != this.lastPoppedUrl)
-					console.log('current scroll height ', contentContainer.scrollTop);
+				if (ev.url != this.lastPoppedUrl){
 					this.yScrollStack.push(contentContainer.scrollTop);
+				}
 			}
 			
 		});
 	}
 	onNavClick() {
-		console.log('nav click happened');
 		this.showNav = ! this.showNav;
-		console.log(this.showNav);
 	}
 	logout(){
 		this.cognitoMain.logout();
