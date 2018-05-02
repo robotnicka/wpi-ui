@@ -2,8 +2,9 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, retryWhen, delayWhen } from 'rxjs/operators';
 import 'rxjs/add/observable/of';
+
 import { environment } from 'environments/environment';
 import {CognitoUtil} from "app/modules/core/cognito.service";
 import { User, Office, OrgUnit, OrgUnitSearch, UserSearch } from './models/';
@@ -11,8 +12,9 @@ import { User, Office, OrgUnit, OrgUnitSearch, UserSearch } from './models/';
 @Injectable()
 export class HubService {
 	headers: HttpHeaders;
+	idToken: string;
 	private currentIdToken: BehaviorSubject<string> = new BehaviorSubject(null);
-	private currentUser: Observable<User>;
+	private currentUser: Observable<User> = null;
 	public currentUserId: number = -1;
 	public orgUnitTypes:string[] = [];
 	public officeRoles:Object = {};
@@ -22,14 +24,7 @@ export class HubService {
 		this.cognitoMain.getIdToken().subscribe(
 			(idToken: string)=>
 			{
-				console.log('HubService setting id token:', idToken);
-				if(idToken == null){
-					if(this.headers.has('Authorization')){
-						this.headers = this.headers.delete('Authorization');
-					}
-				}
-				else this.headers = this.headers.set('Authorization', idToken);
-				this.currentIdToken.next(idToken);
+				this.setIdToken(idToken);
 			}
 		);
 		this.http.get<string[]>(environment.hub.url+'org-unit/types').subscribe(
@@ -42,9 +37,34 @@ export class HubService {
 		);
 	}
 	
+	checkIdToken(): Observable<string>{
+		return this.cognitoMain.getIdToken()
+			.map((idToken) => {
+				if(idToken && idToken != this.idToken){
+					console.log('id token has changed');
+					console.log('old token', this.idToken);
+					console.log('nw token', idToken);
+					this.setIdToken(idToken);
+				}
+				return idToken;
+			});
+	}
+	
+	setIdToken(idToken: string){
+		console.log('HubService setting id token:', idToken);
+		if(idToken == null){
+			if(this.headers.has('Authorization')){
+				this.headers = this.headers.delete('Authorization');
+			}
+		}
+		else this.headers = this.headers.set('Authorization', idToken);
+		this.idToken = idToken;
+		this.currentIdToken.next(idToken);
+	}
+	
 	getCurrentUser():Observable<User>{
 		//Current user depends on the current ID Token. Switchmap on the idToken so that we can update the user as needed
-		if(!this.currentUser){
+		if(this.currentUser == null){
 			console.log('Constructing currentUser');
 			this.currentUser= this.currentIdToken.asObservable()
 			.pipe(switchMap(
@@ -66,34 +86,34 @@ export class HubService {
 		return this.getCurrentUser().pipe(switchMap(
 			(user:User)=>{
 				if(user.offices && user.offices.length){
-					return this.http.get(environment.hub.url+'office/verify/orgunit/'+id,
+					return this.checkIdToken().pipe(switchMap(() => this.http.get(environment.hub.url+'office/verify/orgunit/'+id,
 						{headers: this.headers,
 							params:{roles:Object.keys(this.officeRoles).join(',')}})
 							.pipe(map((response:any) => response.offices))
-							.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;});
+							.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;})));
 				}
 				else return Observable.of([]) as Observable<Office[]>;
 			}
 		));
 	}
 	getOfficerAuthority(officeid: number){
-		return this.http.get(environment.hub.url+'office/verify/office/'+officeid,
+		return this.checkIdToken().pipe(switchMap(() => this.http.get(environment.hub.url+'office/verify/office/'+officeid,
 			{headers: this.headers,
 				params:{roles:Object.keys(this.officeRoles).join(',')}})
 				.pipe(map((response:any) => response.offices))
-				.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;});
+				.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;})));
 	}
 	
 	getUserAuthority(userid: number){
-		return this.http.get(environment.hub.url+'office/verify/user/'+userid,
+		return this.checkIdToken().pipe(switchMap(() => this.http.get(environment.hub.url+'office/verify/user/'+userid,
 			{headers: this.headers,
 				params:{roles:Object.keys(this.officeRoles).join(',')}})
 				.pipe(map((response:any) => response.offices))
-				.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;});
+				.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;})));
 	}
 	
 	public getUser(id: any, options: any = {}):Observable<User>{
-		return this.http.get<User>(environment.hub.url+'user/'+id,{headers: this.headers, params: options});
+		return this.checkIdToken().pipe(switchMap(() => this.http.get<User>(environment.hub.url+'user/'+id,{headers: this.headers, params: options})));
 	}
 	
 	public getUsers(search: UserSearch): Observable<User[]>{
@@ -104,9 +124,9 @@ export class HubService {
 		console.log(searchParams);
 		console.log(searchParams.toString());
 		console.log(searchParams.toString().length);
-		return this.http.get<OrgUnit[]>(environment.hub.url+'user', 
+		return this.checkIdToken().pipe(switchMap(() => this.http.get<OrgUnit[]>(environment.hub.url+'user', 
 										{headers: this.headers, params: searchParams} )
-					.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error'));
+					.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error'))));
 	
 	}
 	
@@ -118,9 +138,9 @@ export class HubService {
 		console.log(searchParams.toString());
 		console.log(searchParams.toString().length);
 		if(searchParams.toString().length==0) searchParams = searchParams.set('type','Nation');
-		return this.http.get<OrgUnit[]>(environment.hub.url+'org-unit', 
+		return this.checkIdToken().pipe(switchMap(() => this.http.get<OrgUnit[]>(environment.hub.url+'org-unit', 
 										{headers: this.headers, params: searchParams} )
-					.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error'));
+					.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error'))));
 	
 	}
 	
@@ -132,8 +152,8 @@ export class HubService {
 			searchParams.parents='0';
 		}
 		let endpointUrl = environment.hub.url+'org-unit/'+id;
-		return this.http.get<OrgUnit>(endpointUrl, {headers: this.headers, params: searchParams as any} )
-			.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error')); 
+		return this.checkIdToken().pipe(switchMap(() => this.http.get<OrgUnit>(endpointUrl, {headers: this.headers, params: searchParams as any} )
+			.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error')))); 
 	}
 	
 	public updateOrgUnit(orgUnit:OrgUnit,office:Office):Observable<OrgUnit>{
@@ -143,7 +163,7 @@ export class HubService {
 			if(orgUnit[fields[i]]) post[fields[i]] = orgUnit[fields[i]];
 		}
 		post['useOffice'] = office.id;
-		return this.http.put<OrgUnit>(environment.hub.url+'org-unit/'+orgUnit.id,post,{headers: this.headers});
+		return this.checkIdToken().pipe(switchMap(() => this.http.put<OrgUnit>(environment.hub.url+'org-unit/'+orgUnit.id,post,{headers: this.headers})));
 	}
 	
 	public addOrgUnit(orgUnit:OrgUnit,parentID:number,office:Office):Observable<OrgUnit>{
@@ -154,18 +174,18 @@ export class HubService {
 		}
 		post['parentID'] = parentID;
 		post['useOffice'] = office.id;
-		return this.http.post<OrgUnit>(environment.hub.url+'org-unit',post,{headers: this.headers});
+		return this.checkIdToken().pipe(switchMap(() => this.http.post<OrgUnit>(environment.hub.url+'org-unit',post,{headers: this.headers})));
 	}
 	
 	public getOffice(officeid: number): Observable<Office>{
-		return this.http.get<Office>(environment.hub.url+'office/'+officeid, {headers: this.headers} )
-			.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error')); 
+		return this.checkIdToken().pipe(switchMap(() => this.http.get<Office>(environment.hub.url+'office/'+officeid, {headers: this.headers} )
+			.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error')))); 
 	}
 	
 	public assignOffice(officeid: number, userid: number,officer:Office): Observable<any>{
 		let post = {'useOffice' : officer.id};
 
-		return this.http.put<any>(environment.hub.url+'office/'+officeid+'/assign/'+userid,post,{headers: this.headers});
+		return this.checkIdToken().pipe(switchMap(() => this.http.put<any>(environment.hub.url+'office/'+officeid+'/assign/'+userid,post,{headers: this.headers})));
 	}
 	
 	public updateOffice(updateOffice:Office,office:Office):Observable<Office>{
@@ -175,7 +195,7 @@ export class HubService {
 			if(updateOffice[fields[i]]) post[fields[i]] = updateOffice[fields[i]];
 		}
 		post['useOffice'] = office.id;
-		return this.http.put<Office>(environment.hub.url+'office/'+updateOffice.id,post,{headers: this.headers});
+		return this.checkIdToken().pipe(switchMap(() => this.http.put<Office>(environment.hub.url+'office/'+updateOffice.id,post,{headers: this.headers})));
 	}
 	
 	public addAssistantOffice(addOffice:Office,office:Office):Observable<Office>{
@@ -185,19 +205,19 @@ export class HubService {
 			if(addOffice[fields[i]]) post[fields[i]] = addOffice[fields[i]];
 		}
 		post['useOffice'] = office.id;
-		return this.http.post<Office>(environment.hub.url+'office/'+addOffice.parentOfficeID+"/assistant",post,{headers: this.headers});
+		return this.checkIdToken().pipe(switchMap(() => this.http.post<Office>(environment.hub.url+'office/'+addOffice.parentOfficeID+"/assistant",post,{headers: this.headers})));
 	}
 	
 	public deleteAssistantOffice(officeid: number,officer:Office): Observable<any>{
 		let post: any = {'useOffice' : officer.id};
 
-		return this.http.delete<any>(environment.hub.url+'office/'+officeid+'/assistant',{headers: this.headers, params: post});
+		return this.checkIdToken().pipe(switchMap(() => this.http.delete<any>(environment.hub.url+'office/'+officeid+'/assistant',{headers: this.headers, params: post})));
 	}
 	
 	public assignMember(userid: number, orgunitid: number,officer:Office): Observable<any>{
 		let post = {'useOffice' : officer.id};
 
-		return this.http.put<any>(environment.hub.url+'user/'+userid+'/assign/'+orgunitid,post,{headers: this.headers});
+		return this.checkIdToken().pipe(switchMap(() => this.http.put<any>(environment.hub.url+'user/'+userid+'/assign/'+orgunitid,post,{headers: this.headers})));
 	}
 	
 	

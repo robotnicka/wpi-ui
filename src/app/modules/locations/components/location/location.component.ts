@@ -170,7 +170,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 			(action:number) =>{
 				if(action > 0){ // I've updated an office
 					this.getOrg();
-					if(action == 2){ // I've just updated an office
+					if(action == 2){ // I've just resigned from an office
 						this.getUserOffices();
 					}
 				}
