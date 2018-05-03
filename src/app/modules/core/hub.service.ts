@@ -17,6 +17,7 @@ export class HubService {
 	private currentUser: Observable<User> = null;
 	public currentUserId: number = -1;
 	public orgUnitTypes:string[] = [];
+	public venueTypes:any[] = [];
 	public officeRoles:Object = {};
 	constructor(private http: HttpClient, @Inject('cognitoMain') private cognitoMain: CognitoUtil) {
 		console.log("constructing hub service");
@@ -29,6 +30,9 @@ export class HubService {
 		);
 		this.http.get<string[]>(environment.hub.url+'org-unit/types').subscribe(
 			(response:string[]) => { this.orgUnitTypes = response;}
+		);
+		this.http.get<any[]>(environment.hub.url+'org-unit/venues').subscribe(
+			(response:string[]) => { this.venueTypes = response;}
 		);
 		this.http.get<Object>(environment.hub.url+'office/roles').subscribe(
 			(response:Object) => {

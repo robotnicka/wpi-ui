@@ -25,6 +25,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 	userOffices: Office[];
 	selectedOffice: Office;
 	canAddOrgs: string[];
+	venueTypes: any[];
 	canTransferMember: boolean = false;
 	isTransferring: boolean = false;
 	transferringMember: User;
