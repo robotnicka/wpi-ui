@@ -9,7 +9,10 @@
 	<h1>{{member.nickname}}</h1>
 	<ul style="list-style-type: none;" *ngIf="!editing">
 		<li><label>Name:</label> <span>{{member.nickname}}</span></li>
-		<li><label>Membership Type:</label> <span>{{member.membershipType}}</span></li>
+		<li><label>Membership Type:</label> <span>{{member.membershipType}}</span>
+		<button type="button" class="btn btn-primary" *ngIf="member.membershipType=='None' && selectedOffice?.roles && selectedOffice.roles.indexOf('user_approve') !== -1" (click)="confirmModal(approveConfirm)">Approve Membership</button>
+
+		</li>
 		<li *ngIf="member.membershipNumber"><label>Membership #:</label> <span>{{member.membershipNumber}}</span></li>
 		<li *ngIf="member.membershipNumber"><label>Expiration:</label> <span>{{member.membershipExpiration}}</span></li>
 		<li><label>Location:</label>
@@ -38,6 +41,13 @@
 	</div>
 	<div class="modal-body">
 		<app-member-transfer *ngIf="isTransferring" [member]="member" [officer]="selectedOffice" (result)="doneTransfer($event)"></app-member-transfer>
+	</div>
+</ng-template>
+<ng-template #approveConfirm>
+	<div class="modal-body text-center">
+		<p>Are you sure you approve this person's membership?</p>
+		<button type="button" class="btn btn-default" (click)="approveMembership()" >Yes</button>
+		<button type="button" class="btn btn-primary" (click)="confirmModalRef.hide()">No</button>
 	</div>
 </ng-template>
 </ng-container>

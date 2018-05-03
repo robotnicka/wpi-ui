@@ -224,5 +224,11 @@ export class HubService {
 		return this.checkIdToken().pipe(switchMap(() => this.http.put<any>(environment.hub.url+'user/'+userid+'/assign/'+orgunitid,post,{headers: this.headers})));
 	}
 	
+	public approveMember(userid: number, officer:Office): Observable<any>{
+		let post = {'useOffice' : officer.id};
+
+		return this.checkIdToken().pipe(switchMap(() => this.http.put<any>(environment.hub.url+'user/'+userid+'/approve',post,{headers: this.headers})));
+	}
+	
 	
 }
