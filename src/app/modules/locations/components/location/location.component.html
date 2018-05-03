@@ -13,7 +13,8 @@
 			<li><label>Code:</label> <span>{{orgUnit.code}}</span></li>
 			<li><label>Name:</label> <span>{{orgUnit.name}}</span></li>
 			<li><label>Location:</label> <span>{{orgUnit.location}}</span></li>
-			<li><label>Type:</label><span>{{orgUnit.type}}</span></li>
+			<li><label>Type: </label><span>{{orgUnit.type}}</span></li>
+			<li *ngIf="orgUnit.venueType"><label>Venue Type: </label><span>{{orgUnit.venueType}}</span></li>
 			<li><label>Website:</label> <span><a [href]="orgUnit.website" target="_blank">{{orgUnit.website}}</a></span></li>
 			<li *ngIf="orgUnit.parents && orgUnit.parents.length"><label>Parent Location:</label> <span><a [routerLink]="['/locations',orgUnit.parents[0].id]">{{orgUnit.parents[0].name}} ({{orgUnit.parents[0].code}})</a></span></li>
 		</ul>
@@ -85,7 +86,16 @@
 				<label class="col-sm-2 col-form-label" for="addOrgWebsite">Website</label>
 				<div class="col-sm-10"><input type="text" class="form-control" id="addOrgWebsite" [(ngModel)]="orgModel.website"/></div>
 			</div>
-			<h4 *ngIf="orgModel.type=='Venue'" class="text-center">Venue Type</h4>
+			<div class="form-group">
+				<h4 *ngIf="orgModel.type=='Venue'" class="text-center">Venue Type</h4>
+				<div class="row" *ngFor="let venueType of venueTypes">
+					<div class="radio col-sm-2">
+						<input type="radio" name="venueType" [id]="'venue_'+venueType.id" [(ngModel)]="orgModel.venueType" [value]="venueType.id"/>
+					</div>
+					<label class="col-sm-10" [for]="'venue_'+venueType.id"><strong>{{venueType.name}}</strong><br/>({{venueType.type}})</label>
+					
+				</div>
+			</div>
 			<div class="form-group row">
 				<label class="col-sm-2 col-form-label" for="addOrgDescription">Description</label>
 				<div class="col-sm-10"><textarea class="form-control" id="addOrgDescription" [(ngModel)]="orgModel.defDoc"></textarea></div>

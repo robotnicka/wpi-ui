@@ -16,7 +16,7 @@ export class MemberSearchComponent implements OnInit, OnDestroy {
 	@Output('selectedMember') selectedMemberOutput = new EventEmitter();
 	@Input() defaultType: string;
 	@Input() disabledTypes: string[];
-	@Input() defaultOrgUnit: OrgUnit;
+	@Input() defaultOrgUnitId: number;
 	users: User[];
 	constructor( private hubService: HubService) {
 		this.searchParams  = new UserSearch();
@@ -32,7 +32,7 @@ export class MemberSearchComponent implements OnInit, OnDestroy {
 			let defaultTypeIndex = this.membershipTypeOptions.indexOf(this.defaultType);
 			if(defaultTypeIndex) this.searchParams.type=this.membershipTypeOptions[defaultTypeIndex];
 		}
-		if(this.defaultOrgUnit) this.searchParams.orgUnit = this.defaultOrgUnit.id;
+		if(this.defaultOrgUnitId) this.searchParams.orgUnit = this.defaultOrgUnitId;
 		console.log('member search starting searchparams',this.searchParams);
 		this.searchSubscription = this.userSearchCriteria.asObservable().pipe(switchMap(
 			(search: UserSearch) => {

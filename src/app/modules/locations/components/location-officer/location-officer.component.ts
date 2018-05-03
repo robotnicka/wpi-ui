@@ -20,6 +20,7 @@ export class LocationOfficerComponent implements OnInit, OnDestroy {
 	isAdding: boolean = false;
 	userOffices: Office[];
 	orgUnit: OrgUnit;
+	hireOrgUnitId: number;
 	office: Office;
 	primaryOffice: Office;
 	selectedOffice: Office
@@ -77,6 +78,8 @@ export class LocationOfficerComponent implements OnInit, OnDestroy {
 	}
 	
 	hireModal(template: TemplateRef<any>) {
+		if(this.orgUnit.type=='Venue') this.hireOrgUnitId = this.orgUnit.parents[0].id;
+		else this.hireOrgUnitId = this.orgUnit.id;
 		this.isHiring = true;
 		this.hireModalRef = this.modalService.show(template);
 	}

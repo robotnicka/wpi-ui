@@ -68,7 +68,7 @@
 		</button>
 	</div>
 	<div class="modal-body">
-		<app-member-search defaultType="Full" [defaultOrgUnit]="orgUnit" [disabledTypes]="['None','Resigned','Expelled']" (selectedMember)="selectedHireMember=$event" *ngIf="isHiring"></app-member-search>
+		<app-member-search defaultType="Full" [defaultOrgUnitId]="hireOrgUnitId" [disabledTypes]="['None','Resigned','Expelled']" (selectedMember)="selectedHireMember=$event" *ngIf="isHiring"></app-member-search>
 		
 		<div *ngIf="selectedHireMember" class="text-center">
 			<p>Are you sure you want to hire {{selectedHireMember.nickname}} for this position?</p>

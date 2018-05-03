@@ -5,6 +5,8 @@ export class OrgUnit {
   code: string;
   name: string;
   type: string;
+  venueType: string;
+  parents: OrgUnit[];
   children: OrgUnit[];
   offices: Office[];
   users: User[];

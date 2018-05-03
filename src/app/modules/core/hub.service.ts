@@ -172,7 +172,7 @@ export class HubService {
 	
 	public addOrgUnit(orgUnit:OrgUnit,parentID:number,office:Office):Observable<OrgUnit>{
 		let post = {};
-		let fields = ['name','code','type','location','defDoc','website'];
+		let fields = ['name','code','type','venueType','location','defDoc','website'];
 		for(let i = 0; i < fields.length; i++){
 			if(orgUnit[fields[i]]) post[fields[i]] = orgUnit[fields[i]];
 		}

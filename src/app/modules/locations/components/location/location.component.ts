@@ -38,6 +38,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 		private modalService: BsModalService) { }
 
 	ngOnInit() {
+		this.venueTypes = this.hubService.venueTypes;
 		this.getOrg();
 		this.getUserOffices();
 	}
@@ -103,6 +104,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 		//this.modalService.show(LocationAddModalComponent, {initialState});
 	}
 	addOrg(){
+		console.log('adding OrgUnit', this.orgModel);
 		this.hubService.addOrgUnit(this.orgModel,this.orgUnit.id,this.selectedOffice).subscribe(
 			(orgUnit:OrgUnit)=>
 			{
