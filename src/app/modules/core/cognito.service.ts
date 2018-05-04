@@ -14,7 +14,6 @@ import {RegistrationUser, RegistrationAddressInfo} from "app/modules/auth/compon
 
 import {
 	AuthenticationDetails,
-	CognitoIdentityServiceProvider,
 	CognitoUser,
 	CognitoUserAttribute,
 	CognitoUserPool,
@@ -413,5 +412,87 @@ export class CognitoUtil {
 			}
 		});
 		return newPasswordResult.asObservable().first(); 
+	}
+	
+	getAttributes(): Observable<any>{
+		let attributesResult = new ReplaySubject<CognitoResponse>();
+		let currentUser = this.getCurrentUser();
+		currentUser.getSession(
+			(err, session) => {
+				if (err) {
+					console.log('getAttributes getSession error', err);
+					attributesResult.error(err);
+					return;
+				}
+				currentUser.getUserAttributes(function(err, result) {
+					if (err) {
+						console.log('getAttributes error', err);
+						attributesResult.error(err);
+						return;
+					}
+					let attributes: any = {};
+					for (let i = 0; i < result.length; i++) {
+						attributes[result[i].getName()] = result[i].getValue();
+					}
+					if(attributes.hasOwnProperty('address')){
+						attributes.parsedAddress = JSON.parse(attributes.address);
+					}
+					attributesResult.next(attributes);
+				});
+		});
+		return attributesResult.asObservable().first();
+	}
+	
+	updateAttributes(attributes){
+		console.log('update attributes', attributes);
+		let attributesResult = new ReplaySubject<any>();
+		let currentUser = this.getCurrentUser();
+		currentUser.getSession(
+			(err, session) => {
+				if (err) {
+					console.log('getAttributes getSession error', err);
+					attributesResult.error(err);
+					return;
+				}
+				let attributeList = [];
+				attributes.address = JSON.stringify(attributes.addressInfo);
+				let attributeNames = ['name','address', 'birthdate', 'nickname'];
+				for(let i = 0; i < attributeNames.length; i++){
+					attributeList.push(new CognitoUserAttribute({Name: attributeNames[i], Value: attributes[attributeNames[i]]})); 
+				}
+				console.log('calling updateAttributes');
+				currentUser.updateAttributes(attributeList, function(err, result) {
+					console.log('received return from updateAttributes');
+					if (err) {
+						console.log('setAttributes error', err);
+						attributesResult.error(err);
+						return;
+					}
+					console.log('call result: ' + result);
+					attributesResult.next(result);
+				});
+		});
+		return attributesResult.asObservable().first().pipe(switchMap(
+			(result) => {
+				let refreshResult = new ReplaySubject<any>();
+				let currentUser = this.getCurrentUser();
+				currentUser.getSession(
+					(err, session) => {
+						if (err) {
+							console.log('refresh getSession error', err);
+							refreshResult.error(err);
+							return;
+						}
+						let refreshToken = session.getRefreshToken();
+						currentUser.refreshSession(refreshToken, (err, session) => {
+							console.log('sucessfully refreshed session!');
+							refreshResult.next(result);
+						});
+				});
+				return refreshResult.asObservable().first();
+			}
+			
+		));
+		
 	}
 }

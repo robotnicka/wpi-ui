@@ -2,13 +2,17 @@
 	<div *ngIf="userOffices && userOffices.length">
 		<span>Viewing as office:</span>
 		<span *ngIf="userOffices.length==1 || editing">{{userOffices[0].name}}</span>
-		<select *ngIf="userOffices.length>1 && !editing" [(ngModel)]="selectedOffice" (change)="officePermissions(selectedOffice)">
+		<select *ngIf="userOffices.length>1 && !editing" [(ngModel)]="selectedOffice">
 			<option *ngFor="let officeOption of userOffices" [ngValue]="officeOption">{{officeOption.name}}</option>
 		</select>
 	</div>
 	<h1>{{member.nickname}}</h1>
+	<button type="button" class="btn btn-primary" *ngIf="member.id==hubService.currentUserId" (click)="editUserModal(editTemplate)">Edit</button>
 	<ul style="list-style-type: none;" *ngIf="!editing">
-		<li><label>Name:</label> <span>{{member.nickname}}</span></li>
+		<li *ngIf="member.fullName"><label>Full Name:</label> <span>{{member.fullName}}</span></li>
+		<li><label *ngIf="!member.fullName">Name:</label><label *ngIf="member.fullName">Preferred Name:</label> <span>{{member.nickname}}</span></li>
+		<li *ngIf="member.email"><label>Email:</label> <a href="mailto:{{member.email}}"><span>{{member.email}}</span></a></li>
+		<li *ngIf="member.address"><label>Address:</label> <span>{{member.address}}</span></li>
 		<li><label>Membership Type:</label> <span>{{member.membershipType}}</span>
 		<button type="button" class="btn btn-primary" *ngIf="member.membershipType=='None' && selectedOffice?.roles && selectedOffice.roles.indexOf('user_approve') !== -1" (click)="confirmModal(approveConfirm)">Approve Membership</button>
 
@@ -49,5 +53,71 @@
 		<button type="button" class="btn btn-default" (click)="approveMembership()" >Yes</button>
 		<button type="button" class="btn btn-primary" (click)="confirmModalRef.hide()">No</button>
 	</div>
+</ng-template>
+
+<ng-template #editTemplate>
+	<ng-container *ngIf="editModel">
+		<div class="modal-header">
+			<h4 class="modal-title pull-left">Manually Add New Member</h4>
+			<button type="button" class="close pull-right" aria-label="Close" (click)="editModalRef.hide()">
+			<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="signupName">Name</label>
+			<div class="col-sm-9"><input id="signupName" type="text" maxlength="50" class="form-control" aria-describedby="nameHelpBlock"
+				   [(ngModel)]="editModel.name" [ngModelOptions]="{standalone: true}"></div>
+			<small id="nameHelpBlock" class="form-text text-muted">Use your full name, for member tracking purposes.</small>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="signupNickname">Preferred Name</label>
+			<div class="col-sm-9"><input id="signupNickname" type="text" maxlength="50" class="form-control" aria-describedby="nicknameHelpBlock"
+				   [(ngModel)]="editModel.nickname" [ngModelOptions]="{standalone: true}"></div>
+			<small id="nicknameHelpBlock" class="form-text text-muted">Use Preferred name for how you'd like to be displayed to other users.</small>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="signupStreetAddress">Address</label>
+			<div class="col-sm-9"><input id="signupStreetAddress" type="text" maxlength="25" class="form-control"
+				   placeholder="at least 6 characters" length="40" [(ngModel)]="editModel.addressInfo.street_address"
+				   [ngModelOptions]="{standalone: true}"></div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="signupCity">City</label>
+			<div class="col-sm-9"><input id="signupCity" type="text" maxlength="25" class="form-control"
+				   placeholder="Anytown" length="40" [(ngModel)]="editModel.addressInfo.locality"
+				   [ngModelOptions]="{standalone: true}"></div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="signupState">State</label>
+			<div class="col-sm-9"><input id="signupState" type="text" maxlength="25" class="form-control"
+				   placeholder="NJ" length="10" [(ngModel)]="editModel.addressInfo.region"
+				   [ngModelOptions]="{standalone: true}"></div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="signupPostal">Zipcode</label>
+			<div class="col-sm-9"><input id="signupPostal" type="text" maxlength="25" class="form-control"
+				   placeholder="12345" length="10" [(ngModel)]="editModel.addressInfo.postal_code"
+				   [ngModelOptions]="{standalone: true}"></div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="signupCountry">Country</label>
+			<div class="col-sm-9"><input id="signupCountry" type="text" maxlength="25" class="form-control"
+				   placeholder="United States" value="United States" length="20" [(ngModel)]="editModel.addressInfo.country"
+				   [ngModelOptions]="{standalone: true}"></div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="signupBirthdate">Birthdate</label>
+			<div class="col-sm-9"><input id="signupBirthdate" type="text" maxlength="25" class="form-control"
+				   placeholder="1901-01-31" length="20" [(ngModel)]="editModel.birthdate"
+				   [ngModelOptions]="{standalone: true}"></div>
+		</div>
+			
+			<div class="text-center">
+				<button type="button" class="btn btn-primary" (click)="editUser()">Save Changes</button>
+				<button type="button" class="btn btn-secondary" (click)="editModalRef.hide()">Cancel</button>
+			</div>
+		</div>
+	</ng-container>
 </ng-template>
 </ng-container>

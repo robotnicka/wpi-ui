@@ -51,7 +51,7 @@
 		</ul>
 		<button type="button" class="btn btn-primary" *ngFor="let addOrgType of canAddOrgs" (click)="addOrgModal(addTemplate,addOrgType)">Add {{addOrgType}}</button>
 	</div>
-	<div *ngIf="orgUnit.type!='Venue'"><h1>Members</h1>
+	<div *ngIf="orgUnit.type!='Venue'"><h1>Members</h1>	<button type="button" class="btn btn-primary" *ngIf="!editing && orgUnit.type!='Venue' && selectedOffice?.roles && selectedOffice.roles.indexOf('user_add') !== -1" (click)="addUserModal(addUserTemplate)">Manually Add Member</button>
 		<span *ngIf="!orgUnit.users || orgUnit.users.length == 0">None!</span>
 		<ul style="list-style-type: none;" *ngIf="orgUnit.users.length">
 			<li *ngFor="let member of orgUnit.users">
@@ -103,6 +103,48 @@
 			<div class="text-center">
 				<button type="button" class="btn btn-primary" (click)="addOrg()">Add</button>
 				<button type="button" class="btn btn-secondary" (click)="addOrgModalRef.hide()">Cancel</button>
+			</div>
+		</div>
+	</ng-container>
+</ng-template>
+<ng-template #addUserTemplate>
+	<ng-container *ngIf="addUserModel">
+		<div class="modal-header">
+			<h4 class="modal-title pull-left">Manually Add New Member</h4>
+			<button type="button" class="close pull-right" aria-label="Close" (click)="addUserModalRef.hide()">
+			<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<div class="form-group row">
+				<label class="col-sm-3 col-form-label" for="addUserFirstName">First Name</label>
+				<div class="col-sm-9"><input type="text" class="form-control" id="addUserFirstName" aria-describedby="nameHelpBlock" [(ngModel)]="addUserModel.firstName" required/></div>
+				<label class="col-sm-3 col-form-label" for="addUserLastName">Last Name</label>
+				<div class="col-sm-9"><input type="text" class="form-control" id="addUserLastName" aria-describedby="nameHelpBlock" [(ngModel)]="addUserModel.lastName" required/></div>
+				<small id="nameHelpBlock" class="form-text text-muted">Use first name and last name for the user's full name, for member tracking purposes.</small>
+				<label class="col-sm-3 col-form-label" for="addUserNickname">Preferred Name</label>
+				<div class="col-sm-9"><input type="text" class="form-control" id="addUserNickname" aria-describedby="nicknameHelpBlock" [(ngModel)]="addUserModel.nickname" required/></div>
+				<small id="nicknameHelpBlock" class="form-text text-muted">Use Preferred name for how they'd like to be displayed to other users.</small>
+
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-3 col-form-label" for="addUserEmail">Address (Optional)</label>
+				<div class="col-sm-9"><input type="text" class="form-control" id="addUserAddress" aria-describedby="addressHelpBlock" [(ngModel)]="addUserModel.address"/></div>
+				<small id="addressHelpBlock" class="form-text text-muted">If you have the user's address add it here, otherwise it'll be set when they register.</small>
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-3 col-form-label" for="addUserLocation">Location</label>
+				<label class="col-sm-9 col-form-label" id="addUserLocation">{{orgUnit.name}} ({{orgUnit.code}})</label>
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-3 col-form-label" for="addUserEmail">Email</label>
+				<div class="col-sm-9"><input type="email" class="form-control" id="addUserEmail" aria-describedby="emailHelpBlock" [(ngModel)]="addUserModel.email" required/></div>
+				<small id="emailHelpBlock" class="form-text text-muted">The user will need to register with the same email address.</small>
+			</div>
+			
+			<div class="text-center">
+				<button type="button" class="btn btn-primary" (click)="addUser()">Add User</button>
+				<button type="button" class="btn btn-secondary" (click)="addUserModalRef.hide()">Cancel</button>
 			</div>
 		</div>
 	</ng-container>

@@ -16,6 +16,7 @@
 			<div>
 				<h5 *ngIf="hubUser.membershipType=='Full'" class="text-center">{{hubUser.membershipNumber}}</h5>
 				<h5 *ngIf="hubUser.membershipType=='None'" class="text-center">(Not a member)</h5>
+				<a [routerLink]="['/members',hubUser.id]" (click)="onNavClick()"><h5 class="text-center">View Profile</h5></a>
 			</div>
 		</ng-container>
 		<div>

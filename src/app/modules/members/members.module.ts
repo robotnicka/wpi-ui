@@ -5,7 +5,6 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { SharedModule } from 'app/modules/shared/shared.module';
 import { MembersComponent } from './components/members/members.component';
 import { MembersRoutingModule } from './members-routing.module';
-import { ProfileComponent } from './components/profile/profile.component';
 import { MemberComponent } from './components/member/member.component';
 
 @NgModule({
@@ -16,6 +15,6 @@ import { MemberComponent } from './components/member/member.component';
     SharedModule,
     MembersRoutingModule
   ],
-  declarations: [MembersComponent, ProfileComponent, MemberComponent]
+  declarations: [MembersComponent, MemberComponent]
 })
 export class MembersModule { }

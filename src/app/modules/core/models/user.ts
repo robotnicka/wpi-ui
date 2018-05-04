@@ -11,6 +11,6 @@ export class User {
   membershipNumber: string;
   membershipType: string;
   nickname: string;
-  orgUnit: OrgUnit;
+  orgUnit: OrgUnit|number;
   offices: Office[];
 }

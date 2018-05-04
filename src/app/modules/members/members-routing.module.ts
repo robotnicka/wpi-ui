@@ -3,7 +3,6 @@ import { RouterModule } from '@angular/router';
 
 import { MembersComponent } from './components/members/members.component';
 import { MemberComponent } from './components/member/member.component';
-import { ProfileComponent } from './components/profile/profile.component';
 
 @NgModule({
 	imports: [
@@ -15,11 +14,8 @@ import { ProfileComponent } from './components/profile/profile.component';
 			{
 				path: ':id',
 				component: MemberComponent
-			},
-			{
-				path: 'profile',
-				component: ProfileComponent
 			}
+			
 		])
 	],
 	exports: [

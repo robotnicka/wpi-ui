@@ -16,6 +16,7 @@ import { LocationOfficerComponent } from '../location-officer/location-officer.c
 })
 export class LocationComponent implements OnInit, OnDestroy {
 	addOrgModalRef: BsModalRef;
+	addUserModalRef: BsModalRef;
 	officerModalRef: BsModalRef;
 	orgSubscription: Subscription;
 	officeSubscription: Subscription;
@@ -30,6 +31,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 	isTransferring: boolean = false;
 	transferringMember: User;
 	orgModel: OrgUnit;
+	addUserModel: User;
 	editing: boolean = false;
 	constructor(private hubService: HubService,
 		private route: ActivatedRoute,
@@ -149,7 +151,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 		}
 		console.log('canAddOrgs',this.canAddOrgs);
 	}
-	officerModal(office){
+	officerModal(office: Office){
 		let initialState = {
 			office: office,
 			orgUnit: this.orgUnit,
@@ -184,7 +186,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 		);
 	}
 	
-	transferModal(template, member){
+	transferModal(template: TemplateRef<any>, member: User){
 		this.transferringMember = member;
 		this.isTransferring = true;
 		this.officerModalRef = this.modalService.show(template);
@@ -196,15 +198,28 @@ export class LocationComponent implements OnInit, OnDestroy {
 		if(result) this.getOrg();
 	}
 	
-	/*officerPermissions(office){
-		if(this.selectedOffice){
-			//we have both a selected office and officers for this unit, let's see what permissions we have over them.
-			this.orgUnit.offices.forEach(
-				function(office: Office){
-					this.hubService;
-				}	
-				
-			);
-		}else this.officeOfficerAuthority = null;
-	}*/
+	addUserModal(template: TemplateRef<any>){
+		this.addUserModel = new User();
+		this.addUserModel.orgUnit = this.orgUnit.id;
+		this.addUserModalRef = this.modalService.show(template);
+	}
+	
+	addUser(){
+		console.log('adding User', this.addUserModel);
+		this.hubService.addUser(this.addUserModel,this.selectedOffice).subscribe(
+			(user:User)=>
+			{
+				this.getOrg();
+				this.toastr.success('Member added!');
+				this.addUserModalRef.hide();
+			},
+			(error)=>{
+				let message = '';
+				if(error.error && error.error.message) message = error.error.message;
+				else if(error.message) message = error.message;
+				else message='Unknown server error';
+				this.toastr.error(message);
+			}
+		);
+	}
 }

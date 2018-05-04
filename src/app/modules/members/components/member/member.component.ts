@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy, TemplateRef } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs/Rx';
@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { HubService} from 'app/modules/core/hub.service';
+import {CognitoUtil} from "app/modules/core/cognito.service";
 import { Office, User} from 'app/modules/core/models/';
 
 
@@ -19,11 +20,14 @@ export class MemberComponent implements OnInit, OnDestroy {
 	officeSubscription: Subscription;
 	transferModalRef: BsModalRef;
 	confirmModalRef: BsModalRef;
+	editModalRef: BsModalRef;
 	member: User;
+	editModel: any;
 	userOffices: Office[];
 	selectedOffice: Office;
 	isTransferring: boolean = false;
-	constructor(private hubService: HubService,
+	constructor(public hubService: HubService,
+		@Inject('cognitoMain') private cognitoMain: CognitoUtil,
 		private route: ActivatedRoute,
 		private router: Router,
 		private toastr: ToastrService,
@@ -33,11 +37,13 @@ export class MemberComponent implements OnInit, OnDestroy {
 		this.getMember();
 		this.getUserOffices();
 	}
-	getMember(){
+	getMember(refresh:boolean = false){
 		if(this.memberSubscription) this.memberSubscription.unsubscribe();
 		this.memberSubscription = this.route.params
 			.pipe(switchMap((params: Params) => {
-				return this.hubService.getUser(params['id'], {offices: 1, children: 1});
+				let getParams:any = {offices: 1, children: 1};
+				if(refresh) getParams.refresh=1;
+				return this.hubService.getUser(params['id'], getParams);
 			})).subscribe(
 				(member) => {
 					this.member = member;
@@ -94,6 +100,34 @@ export class MemberComponent implements OnInit, OnDestroy {
 				this.toastr.error(message);
 			}
 		);
+	}
+	editUserModal(template: TemplateRef<any>){
+		this.cognitoMain.getAttributes().subscribe(
+			(attributes:any) =>
+			{
+				this.editModel = {};
+				this.editModel.name = attributes.name;
+				this.editModel.nickname = attributes.nickname;
+				this.editModel.birthdate = attributes.birthdate;
+				this.editModel.addressInfo = attributes.parsedAddress;
+
+				console.log('editModel', this.editModel);
+				this.editModalRef = this.modalService.show(template);
+			}
+		)
+	}
+	editUser(){
+		this.cognitoMain.updateAttributes(this.editModel).subscribe(
+			data => {
+				this.toastr.success('Details Updated!');
+				this.getMember(true);
+				this.editModalRef.hide();
+			},
+			err => {
+				this.toastr.error(err);
+			}
+			
+		)
 	}
 	ngOnDestroy(){
 		this.memberSubscription.unsubscribe();

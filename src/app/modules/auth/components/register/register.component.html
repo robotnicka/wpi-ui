@@ -5,72 +5,74 @@
 	<div *ngIf="errorMessage!=null" class="alert alert-danger">
 		{{ errorMessage }}
 	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupName">Name</label>
-		<input id="signupName" type="text" maxlength="50" class="form-control"
-			   [(ngModel)]="registrationUser.name" [ngModelOptions]="{standalone: true}">
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupName">Name</label>
+		<div class="col-sm-9"><input id="signupName" type="text" maxlength="50" class="form-control" aria-describedby="nameHelpBlock"
+			   [(ngModel)]="registrationUser.name" [ngModelOptions]="{standalone: true}"></div>
+		<small id="nameHelpBlock" class="form-text text-muted">Use your full name, for member tracking purposes.</small>
 	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupNickname">Preferred Name</label>
-		<input id="signupNickname" type="text" maxlength="50" class="form-control"
-			   [(ngModel)]="registrationUser.nickname" [ngModelOptions]="{standalone: true}">
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupNickname">Preferred Name</label>
+		<div class="col-sm-9"><input id="signupNickname" type="text" maxlength="50" class="form-control" aria-describedby="nicknameHelpBlock"
+			   [(ngModel)]="registrationUser.nickname" [ngModelOptions]="{standalone: true}"></div>
+		<small id="nicknameHelpBlock" class="form-text text-muted">Use Preferred name for how you'd like to be displayed to other users.</small>
 	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupUsername">Username</label>
-		<input id="signupUsername" type="text" maxlength="50" class="form-control"
-			   [(ngModel)]="registrationUser.username" [ngModelOptions]="{standalone: true}">
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupUsername">Username</label>
+		<div class="col-sm-9"><input id="signupUsername" type="text" maxlength="50" class="form-control"
+			   [(ngModel)]="registrationUser.username" [ngModelOptions]="{standalone: true}"></div>
 	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupEmail">Email</label>
-		<input id="signupEmail" type="email" maxlength="50" class="form-control"
-			   [(ngModel)]="registrationUser.email" [ngModelOptions]="{standalone: true}">
-	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupPassword">Password</label>
-		<input id="signupPassword" type="password" maxlength="25" class="form-control"
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupPassword">Password</label>
+		<div class="col-sm-9"><input id="signupPassword" type="password" maxlength="25" class="form-control"
 			   placeholder="at least 8 characters" length="40" [(ngModel)]="registrationUser.password"
-			   [ngModelOptions]="{standalone: true}">
+			   [ngModelOptions]="{standalone: true}"></div>
 	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupStreetAddress">Address</label>
-		<input id="signupStreetAddress" type="text" maxlength="25" class="form-control"
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupEmail">Email</label>
+		<div class="col-sm-9"><input id="signupEmail" type="email" maxlength="50" class="form-control"
+			   [(ngModel)]="registrationUser.email" [ngModelOptions]="{standalone: true}"></div>
+	</div>
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupStreetAddress">Address</label>
+		<div class="col-sm-9"><input id="signupStreetAddress" type="text" maxlength="25" class="form-control"
 			   placeholder="at least 6 characters" length="40" [(ngModel)]="registrationUser.addressInfo.street_address"
-			   [ngModelOptions]="{standalone: true}">
+			   [ngModelOptions]="{standalone: true}"></div>
 	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupCity">City</label>
-		<input id="signupCity" type="text" maxlength="25" class="form-control"
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupCity">City</label>
+		<div class="col-sm-9"><input id="signupCity" type="text" maxlength="25" class="form-control"
 			   placeholder="Anytown" length="40" [(ngModel)]="registrationUser.addressInfo.locality"
-			   [ngModelOptions]="{standalone: true}">
+			   [ngModelOptions]="{standalone: true}"></div>
 	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupState">State</label>
-		<input id="signupState" type="text" maxlength="25" class="form-control"
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupState">State</label>
+		<div class="col-sm-9"><input id="signupState" type="text" maxlength="25" class="form-control"
 			   placeholder="NJ" length="10" [(ngModel)]="registrationUser.addressInfo.region"
-			   [ngModelOptions]="{standalone: true}">
+			   [ngModelOptions]="{standalone: true}"></div>
 	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupPostal">Zipcode</label>
-		<input id="signupPostal" type="text" maxlength="25" class="form-control"
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupPostal">Zipcode</label>
+		<div class="col-sm-9"><input id="signupPostal" type="text" maxlength="25" class="form-control"
 			   placeholder="12345" length="10" [(ngModel)]="registrationUser.addressInfo.postal_code"
-			   [ngModelOptions]="{standalone: true}">
+			   [ngModelOptions]="{standalone: true}"></div>
 	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupCountry">Country</label>
-		<input id="signupCountry" type="text" maxlength="25" class="form-control"
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupCountry">Country</label>
+		<div class="col-sm-9"><input id="signupCountry" type="text" maxlength="25" class="form-control"
 			   placeholder="United States" value="United States" length="20" [(ngModel)]="registrationUser.addressInfo.country"
-			   [ngModelOptions]="{standalone: true}">
+			   [ngModelOptions]="{standalone: true}"></div>
 	</div>
-	<div class="form-group">
-		<label class="control-label" for="signupBirthdate">Birthdate</label>
-		<input id="signupBirthdate" type="text" maxlength="25" class="form-control"
+	<div class="form-group row">
+		<label class="col-sm-3 col-form-label" for="signupBirthdate">Birthdate</label>
+		<div class="col-sm-9"><input id="signupBirthdate" type="text" maxlength="25" class="form-control"
 			   placeholder="1901-01-31" length="20" [(ngModel)]="registrationUser.birthdate"
-			   [ngModelOptions]="{standalone: true}">
+			   [ngModelOptions]="{standalone: true}"></div>
 	</div>
 	
 
 	<div class="form-group">
-		<button (click)="onRegister()" id="signupSubmit" type="submit" class="btn btn-info btn-block">
+		<button (click)="onRegister()" id="signupSubmit" type="submit" class="btn btn-primary">
 			Create your account
 		</button>
 	</div>

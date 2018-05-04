@@ -47,7 +47,7 @@ export class HubService {
 				if(idToken && idToken != this.idToken){
 					console.log('id token has changed');
 					console.log('old token', this.idToken);
-					console.log('nw token', idToken);
+					console.log('new token', idToken);
 					this.setIdToken(idToken);
 				}
 				return idToken;
@@ -78,7 +78,7 @@ export class HubService {
 						return Observable.of(null);
 					}
 					else{
-						return this.getUser('me',{offices: 1}).map((user) => { this.currentUserId = user.id; return user;});
+						return this.getUser('me',{offices: 1, children: 1}).map((user) => { this.currentUserId = user.id; return user;});
 					}
 				}
 			));
@@ -228,6 +228,16 @@ export class HubService {
 		let post = {'useOffice' : officer.id};
 
 		return this.checkIdToken().pipe(switchMap(() => this.http.put<any>(environment.hub.url+'user/'+userid+'/approve',post,{headers: this.headers})));
+	}
+	
+	public addUser(user: User, officer:Office): Observable<any>{
+		let post = {};
+		let fields = ['firstName','lastName','nickname','orgUnit','address','email'];
+		for(let i = 0; i < fields.length; i++){
+			if(user[fields[i]]) post[fields[i]] = user[fields[i]];
+		}
+		post['useOffice'] = officer.id;
+		return this.checkIdToken().pipe(switchMap(() => this.http.post<User>(environment.hub.url+'user',post,{headers: this.headers})));
 	}
 	
 	
