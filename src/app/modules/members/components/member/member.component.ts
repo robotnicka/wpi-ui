@@ -41,7 +41,7 @@ export class MemberComponent implements OnInit, OnDestroy {
 		if(this.memberSubscription) this.memberSubscription.unsubscribe();
 		this.memberSubscription = this.route.params
 			.pipe(switchMap((params: Params) => {
-				let getParams:any = {offices: 1, children: 1};
+				let getParams:any = {offices: 1, children: 1, private: 1};
 				if(refresh) getParams.refresh=1;
 				return this.hubService.getUser(params['id'], getParams);
 			})).subscribe(
