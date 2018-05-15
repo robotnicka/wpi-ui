@@ -7,8 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { HubService} from 'app/modules/core/hub.service';
-import {CognitoUtil} from "app/modules/core/cognito.service";
-import { Office, User} from 'app/modules/core/models/';
+import { CognitoUtil } from "app/modules/core/cognito.service";
+import { Office, User, PasswordChange } from 'app/modules/core/models/';
 
 
 @Component({
@@ -23,6 +23,8 @@ export class MemberComponent implements OnInit, OnDestroy {
 	editModalRef: BsModalRef;
 	member: User;
 	editModel: any;
+	passwordChangeModel: PasswordChange;
+	confirmPassword: string;
 	userOffices: Office[];
 	selectedOffice: Office;
 	isTransferring: boolean = false;
@@ -115,6 +117,16 @@ export class MemberComponent implements OnInit, OnDestroy {
 				this.editModalRef = this.modalService.show(template);
 			}
 		)
+	}
+	
+	editPasswordModal(template: TemplateRef<any>){
+		this.passwordChangeModel = new PasswordChange();
+		this.confirmPassword = '';
+		this.editModalRef = this.modalService.show(template);
+		
+		setTimeout(() => {
+			document.getElementById('editCurrentPassword').focus();
+		}, 500);
 	}
 	editUser(){
 		this.cognitoMain.updateAttributes(this.editModel).subscribe(

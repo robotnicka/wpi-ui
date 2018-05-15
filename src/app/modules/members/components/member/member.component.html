@@ -8,6 +8,7 @@
 	</div>
 	<h1>{{member.nickname}}</h1>
 	<button type="button" class="btn btn-primary" *ngIf="member.id==hubService.currentUserId" (click)="editUserModal(editTemplate)">Edit</button>
+	<button type="button" class="btn btn-primary" *ngIf="member.id==hubService.currentUserId" (click)="editPasswordModal(passwordTemplate)">Change Password</button>
 	<ul style="list-style-type: none;" *ngIf="!editing">
 		<li *ngIf="member.fullName"><label>Full Name:</label> <span>{{member.fullName}}</span></li>
 		<li><label *ngIf="!member.fullName">Name:</label><label *ngIf="member.fullName">Preferred Name:</label> <span>{{member.nickname}}</span></li>
@@ -112,6 +113,69 @@
 				   placeholder="1901-01-31" length="20" [(ngModel)]="editModel.birthdate"
 				   [ngModelOptions]="{standalone: true}"></div>
 		</div>
+			
+			<div class="text-center">
+				<button type="button" class="btn btn-primary" (click)="editUser()">Save Changes</button>
+				<button type="button" class="btn btn-secondary" (click)="editModalRef.hide()">Cancel</button>
+			</div>
+		</div>
+	</ng-container>
+</ng-template>
+
+<ng-template #passwordTemplate>
+	<ng-container *ngIf="passwordChangeModel">
+		<div class="modal-header">
+			<h4 class="modal-title pull-left">Change Password</h4>
+			<button type="button" class="close pull-right" aria-label="Close" (click)="editModalRef.hide()">
+			<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="editCurrentPassword">Current Password</label>
+			<div class="col-sm-9"><input id="editCurrentPassword" type="password" maxlength="50" class="form-control"
+				 [(ngModel)]="passwordChangeModel.oldPassword" [ngModelOptions]="{standalone: true}"></div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="editNewPassword">New Password</label>
+			<div class="col-sm-9">
+				<input id="editNewPassword" type="password" class="form-control" aria-describedby="passwordHelpBlock"
+				minlength="8" maxlength="50" required pattern="^(?=.*[a-zA-Z])(?=.*\d).*$"
+				[(ngModel)]="passwordChangeModel.newPassword" [ngModelOptions]="{standalone: true}" #passwordField="ngModel">
+				<small id="passwordHelpBlock" class="form-text text-muted">Passwords must be at least 8 characters, with both letters and numbers</small>
+				<div *ngIf="(passwordField.dirty || passwordField.touched)"
+				class="alert alert-secondary">
+					<div>
+						<i *ngIf="passwordChangeModel.newPassword && !passwordField.errors?.minlength && !passwordField.errors?.maxlength" class="material-icons" style="color:green">done</i>
+						<i *ngIf="!passwordChangeModel.newPassword || passwordField.errors?.minlength || passwordField.errors?.maxlength" class="material-icons" style="color:red">clear</i>
+						<span>At least 8 characters</span>
+					</div>
+					<div>
+						<i *ngIf="passwordChangeModel.newPassword && !passwordField.errors?.pattern" class="material-icons" style="color:green">done</i>
+						<i *ngIf="!passwordChangeModel.newPassword || passwordField.errors?.pattern" class="material-icons" style="color:red">clear</i>
+						<span>Contains both numbers and letters</span>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label" for="editConfirmPassword">Confirm New Password</label>
+			<div class="col-sm-9"><input id="editConfirmassword" type="password" class="form-control"
+				minlength="8" maxlength="50" validateEqualTo="passwordChangeModel.newPassword"
+				[(ngModel)]="passwordChangeModel.confirmPassword" [ngModelOptions]="{standalone: true}" #confirmPasswordField="ngModel">
+				<div *ngIf="(confirmPasswordField.dirty || confirmPasswordField.touched)"
+				class="alert alert-secondary">
+					<div>
+						<i *ngIf="passwordChangeModel.confirmPassword == passwordChangeModel.newPassword" class="material-icons" style="color:green">done</i>
+						<i *ngIf="passwordChangeModel.confirmPassword != passwordChangeModel.newPassword" class="material-icons" style="color:red">clear</i>
+						<span>Matches New Password</span>
+					</div>
+					
+				</div>	 
+			</div>
+		</div>
+		
 			
 			<div class="text-center">
 				<button type="button" class="btn btn-primary" (click)="editUser()">Save Changes</button>
