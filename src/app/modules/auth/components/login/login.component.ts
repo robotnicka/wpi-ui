@@ -1,4 +1,4 @@
-import {Component, OnInit, Inject} from "@angular/core";
+import {Component, OnInit, Inject, ViewChild, ElementRef} from "@angular/core";
 import {Router,ActivatedRoute} from "@angular/router";
 import {CognitoUtil, CognitoResponse, LoginResponse} from "app/modules/core/cognito.service";
 
@@ -7,20 +7,21 @@ import {CognitoUtil, CognitoResponse, LoginResponse} from "app/modules/core/cogn
   templateUrl: './login.component.html'
 })
 export class LoginComponent implements OnInit {
-    username: string;
-    password: string;
-    errorMessage: string;
-    needConfirm: boolean = false;
-    notFoundEmail: boolean = false;
+	@ViewChild('loginUsername') loginUsername: ElementRef;
+	username: string;
+	password: string;
+	errorMessage: string;
+	needConfirm: boolean = false;
+	notFoundEmail: boolean = false;
 	loggedIn: boolean = false;
-    constructor(public router: Router, @Inject('cognitoMain') private cognitoMain: CognitoUtil){
-        console.log("LoginComponent constructor");
-    }
+	constructor(public router: Router, @Inject('cognitoMain') private cognitoMain: CognitoUtil){
+		console.log("LoginComponent constructor");
+	}
 
-    ngOnInit() {
-        this.errorMessage = null;
-        this.cognitoMain.isAuthenticated().subscribe(
-        	(response:LoginResponse)=>{
+	ngOnInit() {
+		this.errorMessage = null;
+		this.cognitoMain.isAuthenticated().subscribe(
+			(response:LoginResponse)=>{
 				console.log('login page init');
 				console.log('loggedIn?',response.loggedIn);
 				if(response.loggedIn){
@@ -30,19 +31,23 @@ export class LoginComponent implements OnInit {
 					this.loggedIn = false;
 				}
 			}	
-        );
-    }
+		);
+		setTimeout(() => {
+			this.loginUsername.nativeElement.focus();
+		}, 1);
+		
+	}
 
-    onLogin() {
-    	this.needConfirm = false;
-    	this.notFoundEmail = false;
-        if (this.username == null || this.password == null) {
-            this.errorMessage = "All fields are required";
-            return;
-        }
-        this.errorMessage = null;
-        this.cognitoMain.authenticate(this.username, this.password).subscribe(
-        	(response: CognitoResponse) => {
+	onLogin() {
+		this.needConfirm = false;
+		this.notFoundEmail = false;
+		if (this.username == null || this.password == null) {
+			this.errorMessage = "All fields are required";
+			return;
+		}
+		this.errorMessage = null;
+		this.cognitoMain.authenticate(this.username, this.password).subscribe(
+			(response: CognitoResponse) => {
 				if (response.message != null) { //error
 					this.errorMessage = response.message;
 					if (this.errorMessage === 'User is not confirmed.') {
@@ -61,9 +66,9 @@ export class LoginComponent implements OnInit {
 				} else { //success
 					this.router.navigate(['/members']);
 				}
-        	}
-        );
-    }
+			}
+		);
+	}
 
 
 }

@@ -495,4 +495,24 @@ export class CognitoUtil {
 		));
 		
 	}
+	
+	updatePassword(oldPassword: string, newPassword: string): Observable<any>{
+		let passwordResult = new ReplaySubject<any>();
+		let currentUser = this.getCurrentUser();
+		currentUser.getSession(
+			(err, session) => {
+				if(err){
+					passwordResult.error(err);
+					return;
+				}
+				currentUser.changePassword(oldPassword, newPassword, function(err, result) {
+					if (err) {
+						passwordResult.error(err);
+						return;
+					}
+					passwordResult.next(result);
+				});
+			});
+		return passwordResult.asObservable().first();
+	}
 }

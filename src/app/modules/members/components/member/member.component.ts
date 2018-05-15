@@ -141,6 +141,20 @@ export class MemberComponent implements OnInit, OnDestroy {
 			
 		)
 	}
+	
+	editPassword(){
+		this.cognitoMain.updatePassword(this.passwordChangeModel.oldPassword, this.passwordChangeModel.newPassword).subscribe(
+			data => {
+				this.toastr.success('Password Updated!');
+				this.getMember(true);
+				this.editModalRef.hide();
+			},
+			err => {
+				this.toastr.error(err.message);
+			}
+			
+		)
+	}
 	ngOnDestroy(){
 		this.memberSubscription.unsubscribe();
 		this.officeSubscription.unsubscribe();

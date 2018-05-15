@@ -13,14 +13,14 @@
     	<br/>You'll need your username in order to confirm your email address or resend the confirmation code. Don't remember your username? Then just <a [routerLink] = "['/auth/register']">register again</a>!
     </div>
     <div class="form-group">
-        <label class="control-label" for="signupUsername">Username Or Email</label>
-        <input id="signupUsername" required type="email" maxlength="100" class="form-control" [(ngModel)]="username"
+        <label class="control-label" for="loginUsername">Username Or Email</label>
+        <input #loginUsername id="loginUsername" required type="email" maxlength="100" class="form-control" [(ngModel)]="username"
                [ngModelOptions]="{standalone: true}">
     </div>
 
     <div class="form-group">
-        <label class="control-label" for="signupPassword">Password</label>
-        <input id="signupPassword" required type="password" maxlength="25" class="form-control"
+        <label class="control-label" for="loginPassword">Password</label>
+        <input id="loginPassword" required type="password" maxlength="25" class="form-control"
                length="40" [(ngModel)]="password" [ngModelOptions]="{standalone: true}">
     </div>
     <div class="form-group">

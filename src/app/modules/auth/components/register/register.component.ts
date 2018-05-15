@@ -1,4 +1,4 @@
-import {Component, OnInit, Inject} from "@angular/core";
+import {Component, OnInit, Inject, ViewChild, ElementRef} from "@angular/core";
 import {Router} from "@angular/router";
 import {CognitoUtil, CognitoResponse} from "app/modules/core/cognito.service";
 
@@ -33,6 +33,7 @@ export class RegistrationAddressInfo {
 export class RegisterComponent implements OnInit {
 	registrationUser: RegistrationUser;
 	errorMessage: string;
+	@ViewChild('signupName') signupName: ElementRef;
 
 	constructor(@Inject('cognitoMain') private cognitoMain: CognitoUtil, private router: Router) {
 		this.registrationUser = new RegistrationUser();
@@ -41,7 +42,9 @@ export class RegisterComponent implements OnInit {
 	}
 	
 	ngOnInit(){
-		
+		setTimeout(() => {
+			this.signupName.nativeElement.focus();
+		}, 1);
 	}
 
 	onRegister() {

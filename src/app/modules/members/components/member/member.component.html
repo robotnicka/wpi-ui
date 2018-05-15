@@ -133,8 +133,10 @@
 		<div class="modal-body">
 		<div class="form-group row">
 			<label class="col-sm-3 col-form-label" for="editCurrentPassword">Current Password</label>
-			<div class="col-sm-9"><input id="editCurrentPassword" type="password" maxlength="50" class="form-control"
-				 [(ngModel)]="passwordChangeModel.oldPassword" [ngModelOptions]="{standalone: true}"></div>
+			<div class="col-sm-9">
+				<input id="editCurrentPassword" type="password" maxlength="50" class="form-control"
+				[(ngModel)]="passwordChangeModel.oldPassword" [ngModelOptions]="{standalone: true}">
+			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-3 col-form-label" for="editNewPassword">New Password</label>
@@ -178,7 +180,9 @@
 		
 			
 			<div class="text-center">
-				<button type="button" class="btn btn-primary" (click)="editUser()">Save Changes</button>
+				<button type="button" class="btn btn-primary" (click)="editPassword()"
+					[disabled]="!passwordChangeModel.oldPassword || ! passwordChangeModel.newPassword || passwordChangeModel.newPassword.errors || passwordChangeModel.newPassword != passwordChangeModel.confirmPassword"
+				>Save Changes</button>
 				<button type="button" class="btn btn-secondary" (click)="editModalRef.hide()">Cancel</button>
 			</div>
 		</div>
