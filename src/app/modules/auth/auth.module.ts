@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {FormsModule} from "@angular/forms";
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { LoginComponent } from './components/login/login.component';
 import { AuthRoutingModule } from './auth-routing.module';
 import { AuthComponent } from './components/auth/auth.component';
@@ -14,6 +15,7 @@ import { ForgotComponent } from './components/forgot/forgot.component';
   imports: [
     CommonModule,
     FormsModule,
+    BsDatepickerModule.forRoot(),
     AuthRoutingModule
   ],
   declarations: [LoginComponent, AuthComponent, PasswordComponent, RegisterComponent, ConfirmComponent, ResendComponent, ForgotComponent]

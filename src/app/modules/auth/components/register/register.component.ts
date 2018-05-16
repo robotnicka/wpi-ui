@@ -1,5 +1,6 @@
 import {Component, OnInit, Inject, ViewChild, ElementRef} from "@angular/core";
 import {Router} from "@angular/router";
+import {NgForm} from '@angular/forms';
 import {CognitoUtil, CognitoResponse} from "app/modules/core/cognito.service";
 
 export class RegistrationUser {
@@ -33,7 +34,8 @@ export class RegistrationAddressInfo {
 export class RegisterComponent implements OnInit {
 	registrationUser: RegistrationUser;
 	errorMessage: string;
-	@ViewChild('signupName') signupName: ElementRef;
+	@ViewChild('signupNameInput') signupName: ElementRef;
+	@ViewChild('formTop') formTop: ElementRef;
 
 	constructor(@Inject('cognitoMain') private cognitoMain: CognitoUtil, private router: Router) {
 		this.registrationUser = new RegistrationUser();
@@ -47,8 +49,20 @@ export class RegisterComponent implements OnInit {
 		}, 1);
 	}
 
-	onRegister() {
+	onRegister(signupForm: NgForm) {
+		console.log(signupForm.value);
 		this.errorMessage = null;
+		if(this.registrationUser.birthdate != null){
+			let birthDate = new Date(this.registrationUser.birthdate);
+			this.registrationUser.birthdate = birthDate.getFullYear()+'-'+String(birthDate.getMonth()+1).padStart(2,'0')+'-'+String(birthDate.getDate()).padStart(2,'0');
+		}
+		
+		console.log('birthdate', this.registrationUser.birthdate);
+		if(!signupForm.valid){
+			this.errorMessage="Please check your registration details and try again";
+			this.formTop.nativeElement.scrollIntoView(this.formTop.nativeElement);
+			return;
+		}
 		this.cognitoMain.register(this.registrationUser).subscribe(
 		(response: CognitoResponse) => 
 		{
@@ -59,16 +73,5 @@ export class RegisterComponent implements OnInit {
 				this.router.navigate(['/auth/confirm', response.result.user.username]);
 			}
 		});
-	}
-
-	cognitoCallback(message: string, result: any) {
-		if (message != null) { //error
-			this.errorMessage = message;
-			console.log("result: " + this.errorMessage);
-		} else { //success
-			//move to the next step
-			console.log("redirecting");
-			this.router.navigate(['/home/confirmRegistration', result.user.email]);
-		}
 	}
 }

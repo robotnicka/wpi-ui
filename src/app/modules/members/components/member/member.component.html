@@ -145,12 +145,11 @@
 				minlength="8" maxlength="50" required pattern="^(?=.*[a-zA-Z])(?=.*\d).*$"
 				[(ngModel)]="passwordChangeModel.newPassword" [ngModelOptions]="{standalone: true}" #passwordField="ngModel">
 				<small id="passwordHelpBlock" class="form-text text-muted">Passwords must be at least 8 characters, with both letters and numbers</small>
-				<div *ngIf="(passwordField.dirty || passwordField.touched)"
-				class="alert alert-secondary">
+				<div *ngIf="(passwordField.dirty || passwordField.touched)" class="alert alert-secondary">
 					<div>
 						<i *ngIf="passwordChangeModel.newPassword && !passwordField.errors?.minlength && !passwordField.errors?.maxlength" class="material-icons" style="color:green">done</i>
 						<i *ngIf="!passwordChangeModel.newPassword || passwordField.errors?.minlength || passwordField.errors?.maxlength" class="material-icons" style="color:red">clear</i>
-						<span>At least 8 characters</span>
+						<span>8 - 50 characters</span>
 					</div>
 					<div>
 						<i *ngIf="passwordChangeModel.newPassword && !passwordField.errors?.pattern" class="material-icons" style="color:green">done</i>
@@ -186,6 +185,7 @@
 				<button type="button" class="btn btn-secondary" (click)="editModalRef.hide()">Cancel</button>
 			</div>
 		</div>
+
 	</ng-container>
 </ng-template>
 </ng-container>

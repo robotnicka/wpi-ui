@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { ToastrModule } from 'ngx-toastr';
 import { SidebarModule } from 'ng-sidebar';
 import { CoreModule } from './modules/core/core.module';
@@ -17,6 +18,7 @@ import { NavComponent} from './nav/nav.component';
 		AppRoutingModule,
 		BrowserModule,
 		CoreModule,
+		BsDatepickerModule.forRoot(),
 		SidebarModule.forRoot(),
 		BrowserAnimationsModule, // required animations module
 		ToastrModule.forRoot() // ToastrModule added
