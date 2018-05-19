@@ -36,7 +36,7 @@ export class RegisterComponent implements OnInit {
 	errorMessage: string;
 	@ViewChild('signupNameInput') signupName: ElementRef;
 	@ViewChild('formTop') formTop: ElementRef;
-
+	public submitting: boolean = false;
 	constructor(@Inject('cognitoMain') private cognitoMain: CognitoUtil, private router: Router) {
 		this.registrationUser = new RegistrationUser();
 		this.registrationUser.addressInfo = new RegistrationAddressInfo();
@@ -50,6 +50,7 @@ export class RegisterComponent implements OnInit {
 	}
 
 	onRegister(signupForm: NgForm) {
+		this.submitting=true;
 		console.log(signupForm.value);
 		this.errorMessage = null;
 		if(this.registrationUser.birthdate != null){
@@ -61,6 +62,7 @@ export class RegisterComponent implements OnInit {
 		if(!signupForm.valid){
 			this.errorMessage="Please check your registration details and try again";
 			this.formTop.nativeElement.scrollIntoView(this.formTop.nativeElement);
+			this.submitting=false;
 			return;
 		}
 		this.cognitoMain.register(this.registrationUser).subscribe(
@@ -68,6 +70,9 @@ export class RegisterComponent implements OnInit {
 		{
 			if(response.message){
 				this.errorMessage = response.message;
+				this.submitting = false;
+				this.formTop.nativeElement.scrollIntoView(this.formTop.nativeElement);
+				return;
 			}else{
 				console.log(response.result);
 				this.router.navigate(['/auth/confirm', response.result.user.username]);

@@ -11,6 +11,7 @@ export class ConfirmComponent implements OnInit, OnDestroy {
 	public pathUsername: string;
 	public username: string;
 	public notFoundEmail: boolean = false;
+	public submitting : boolean = false;
 	public errorMessage: string;
 	private sub: any;
 
@@ -37,9 +38,11 @@ export class ConfirmComponent implements OnInit, OnDestroy {
 	onConfirmRegistration() {
 		this.errorMessage = null;
 		this.notFoundEmail = false;
+		this.submitting = true;
 		this.cognitoMain.confirmRegistration(this.username, this.confirmationCode).subscribe(
 			(response: CognitoResponse) => {
 				if (response.message != null) { //error
+					this.submitting = false;
 					this.errorMessage = response.message;
 					console.log("message: " + this.errorMessage);
 					if(this.errorMessage == 'Username/client id combination not found.'){

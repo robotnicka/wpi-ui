@@ -14,6 +14,7 @@ export class LoginComponent implements OnInit {
 	needConfirm: boolean = false;
 	notFoundEmail: boolean = false;
 	loggedIn: boolean = false;
+	public submitting: boolean = false;
 	constructor(public router: Router, @Inject('cognitoMain') private cognitoMain: CognitoUtil){
 		console.log("LoginComponent constructor");
 	}
@@ -41,10 +42,12 @@ export class LoginComponent implements OnInit {
 	onLogin() {
 		this.needConfirm = false;
 		this.notFoundEmail = false;
+		
 		if (this.username == null || this.password == null) {
 			this.errorMessage = "All fields are required";
 			return;
 		}
+		this.submitting = true;
 		this.errorMessage = null;
 		this.cognitoMain.authenticate(this.username, this.password).subscribe(
 			(response: CognitoResponse) => {
@@ -63,6 +66,7 @@ export class LoginComponent implements OnInit {
 						console.log("redirecting to set new password");
 						this.router.navigate(['/auth/password']);
 					}
+					this.submitting = false;
 				} else { //success
 					this.router.navigate(['/members']);
 				}
