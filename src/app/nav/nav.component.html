@@ -69,7 +69,7 @@
 		</div>
 	</div>
 </nav>
-<nav class="navbar fixed-top navbar-toggleable-sm navbar--secondbar" role="navigation">
+<nav class="navbar fixed-top navbar-toggleable-sm navbar--secondbar" role="navigation" *ngIf="submenuItems && submenuItems.length">
 	<div class="container">
 		<div class="mr-auto">
 			<ul *ngIf="submenuItems" class="navbar-nav mr-auto">

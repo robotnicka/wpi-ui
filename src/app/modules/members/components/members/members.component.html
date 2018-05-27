@@ -1,17 +1,39 @@
-<ul style="list-style-type: none;" *ngIf="users && users.length">
-	<li *ngFor="let member of users">
-		<span><a [routerLink]="['/members',member.id]">{{member.nickname}} <ng-container *ngIf="member.membershipNumber">({{member.membershipNumber}})</ng-container><ng-container *ngIf="!member.membershipNumber">(Non-Member)</ng-container></a></span>
-	</li>
-</ul>
-<span *ngIf="!users || !users.length">No members found for search</span>
-<div>
-<h2>Search</h2>	
-<label>Name</label> <input type="text" [(ngModel)]="searchParams.name"/><br/>
-<label>Email</label> <input type="text" [(ngModel)]="searchParams.email"/><br/>
-<label>Member Number</label> <input type="text" [(ngModel)]="searchParams.membershipNumber"/><br/>
-<label>Membership Type</label> 
-	<select [(ngModel)]="searchParams.type">
-		<option *ngFor="let membertype of membershipTypeOptions" [ngValue]="membertype">{{membertype}}</option>
-	</select><br/>
-<button type="button" class="btn btn-primary" (click)="search()">Search</button>
+<div class="row">
+	<div class="col-sm-6">
+		<form (ngSubmit)="search()">
+		<div class="row form-group">
+			<label class="col-sm-4 col-form-label">Name</label> 
+			<div class="col-sm-8"><input name="searchName" type="text" [(ngModel)]="searchParams.name"/></div>
+		</div>
+		<div class="row form-group">
+			<label class="col-sm-4 col-form-label" >Email</label>
+			<div class="col-sm-8"><input name="searchEmail" type="text"  [(ngModel)]="searchParams.email"/></div>
+		</div>
+		<div class="row form-group">
+			<label class="col-sm-4 col-form-label" >Member Number</label>
+			<div class="col-sm-8"><input name="searchMembershipNumber" type="text" [(ngModel)]="searchParams.membershipNumber"/></div>
+		</div>
+		<div class="row form-group">
+			<label class="col-sm-4 col-form-label" >Membership Type</label>
+			<div class="col-sm-8">
+				<select name="searchMembershipType" [(ngModel)]="searchParams.type">
+					<option *ngFor="let membertype of membershipTypeOptions" [ngValue]="membertype">{{membertype}}</option>
+				</select>
+			</div>
+		</div>
+		<div class="row form-group text-center">
+			<div class="col-sm-12">
+				<button type="submit" class="btn btn-primary">Search</button>
+			</div>
+		</div>
+		</form>
+	</div>
+	<div class="col-sm-6">
+		<ul class="list-group" *ngIf="users && users.length">
+			<li class="list-group-item" *ngFor="let member of users">
+				<span><a [routerLink]="['/members',member.id]">{{member.nickname}} <ng-container *ngIf="member.membershipNumber">({{member.membershipNumber}})</ng-container><ng-container *ngIf="!member.membershipNumber">(Non-Member)</ng-container></a></span>
+			</li>
+		</ul>
+		<span *ngIf="!users || !users.length">No members found for search</span>
+	</div>
 </div>

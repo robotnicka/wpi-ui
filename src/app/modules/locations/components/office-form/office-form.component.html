@@ -13,10 +13,10 @@
 			<li *ngFor="let role of office.roles">{{role}}</li>
 		</ul>
 		<div *ngIf="editingOfficeRoles">
-			<span *ngFor="let role of editingOfficeRoles">
-				<input type="checkbox" [(ngModel)]="role.checked" [disabled]="role.disabled" [id]="'role' + role.name">
-				<label class="form-check-label" [for]="'role' + role.name">({{role.name}}) {{hubService.officeRoles[role.name]}}</label><br/>
-			</span>
+			<div class="row" *ngFor="let role of editingOfficeRoles">
+				<div class="col-sm-1"><input type="checkbox" [(ngModel)]="role.checked" [disabled]="role.disabled" [id]="'role' + role.name"></div>
+				<div class="col-sm-11"><label class="form-check-label" [for]="'role' + role.name">({{role.name}}) {{hubService.officeRoles[role.name]}}</label></div>
+			</div>
 		</div>
 	</div>
 	  

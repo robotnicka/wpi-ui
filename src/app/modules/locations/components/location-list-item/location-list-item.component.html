@@ -1,11 +1,11 @@
 <span>
 	<a *ngIf="fetchedOrgUnit == null || (fetchedOrgUnit.children!==null && fetchedOrgUnit.children.length)" (click)="toggle()">
-		<span *ngIf="expanded">[ - ]</span>
-		<span *ngIf="!expanded">[+]</span>
+		<i *ngIf="expanded" class="material-icons">keyboard_arrow_down</i>
+		<i *ngIf="!expanded" class="material-icons">keyboard_arrow_right</i>
 	</a>
 
 	<a [routerLink]="orgUnit.id">({{orgUnit.code}}) {{orgUnit.name}}</a>
-	<ul *ngIf="expanded && children">
-		<li *ngFor="let child of children"><app-location-list-item [orgUnit]="child"></app-location-list-item></li>
+	<ul class="list-group" *ngIf="expanded && children">
+		<li class="list-group-item" *ngFor="let child of children"><app-location-list-item [orgUnit]="child"></app-location-list-item></li>
 	</ul>
 </span>
