@@ -1,42 +1,89 @@
-<ng-container *ngIf="member">
-	<div *ngIf="userOffices && userOffices.length">
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item" aria-current="page"><a routerLink="/members">Member Search</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><span *ngIf="member?.nickname">{{member.nickname}}</span><span *ngIf="!member?.nickname">{{currentId}}</span></li>
+  </ol>
+</nav>
+
+<div *ngIf="error" class="alert alert-danger" role="alert">
+	<span>Unable to fetch member information</span>
+	<div *ngIf="error.status">
+		<span *ngIf="error.status==403">
+			Your user does not have permission to view member information: 
+			<span *ngIf="error.message!='User is not a member'">{{error.message}}</span>
+			<span *ngIf="error.message=='User is not a member'">You are not currently a member.</span>
+			<br/><a [routerLink]="['/members',hubService.currentUserId]">View your profile to check your membership status.</a>
+		</span>
+		
+	</div>
+</div>
+<ng-container *ngIf="member && !member.error">
+	<div class="alert alert-info" role="alert" *ngIf="userOffices && userOffices.length">
 		<span>Viewing as office:</span>
 		<span *ngIf="userOffices.length==1 || editing">{{userOffices[0].name}}</span>
 		<select *ngIf="userOffices.length>1 && !editing" [(ngModel)]="selectedOffice">
 			<option *ngFor="let officeOption of userOffices" [ngValue]="officeOption">{{officeOption.name}}</option>
 		</select>
 	</div>
-	<h1>{{member.nickname}}</h1>
-	<button type="button" class="btn btn-primary" *ngIf="member.id==hubService.currentUserId" (click)="editUserModal(editTemplate)">Edit</button>
-	<button type="button" class="btn btn-primary" *ngIf="member.id==hubService.currentUserId" (click)="editPasswordModal(passwordTemplate)">Change Password</button>
-	<ul style="list-style-type: none;" *ngIf="!editing">
-		<li *ngIf="member.fullName"><label>Full Name:</label> <span>{{member.fullName}}</span></li>
-		<li><label *ngIf="!member.fullName">Name:</label><label *ngIf="member.fullName">Preferred Name:</label> <span>{{member.nickname}}</span></li>
-		<li *ngIf="member.email"><label>Email:</label> <a href="mailto:{{member.email}}"><span>{{member.email}}</span></a></li>
-		<li *ngIf="member.address"><label>Address:</label> <span>{{member.address}}</span></li>
-		<li><label>Membership Type:</label> <span>{{member.membershipType}}</span>
-		<button type="button" class="btn btn-primary" *ngIf="member.membershipType=='None' && selectedOffice?.roles && selectedOffice.roles.indexOf('user_approve') !== -1" (click)="confirmModal(approveConfirm)">Approve Membership</button>
-
-		</li>
-		<li *ngIf="member.membershipNumber"><label>Membership #:</label> <span>{{member.membershipNumber}}</span></li>
-		<li *ngIf="member.membershipNumber"><label>Expiration:</label> <span>{{member.membershipExpiration}}</span></li>
-		<li><label>Location:</label>
-			<span *ngIf="!member.orgUnit">None</span>
-			<span *ngIf="member.orgUnit"><a [routerLink]="['/locations',member.orgUnit.id]">{{member.orgUnit.name}} ({{member.orgUnit.code}})</a></span>
-		</li>
-	</ul>
-	<button type="button" class="btn btn-primary" *ngIf="selectedOffice?.roles && selectedOffice.roles.indexOf('user_assign') !== -1" (click)="transferModal(transferTemplate)">Transfer</button>
-	<div *ngIf="editing">
+	<div class="card"><div class="card-body">
+		<div class="card-header">
+			<h1>{{member.nickname}}</h1>
+			<button type="button" class="btn btn-primary" *ngIf="member.id==hubService.currentUserId" (click)="editUserModal(editTemplate)">Edit</button>
+			<button type="button" class="btn btn-primary" *ngIf="member.id==hubService.currentUserId" (click)="editPasswordModal(passwordTemplate)">Change Password</button>
+			<button type="button" class="btn btn-primary" *ngIf="selectedOffice?.roles && selectedOffice.roles.indexOf('user_assign') !== -1" (click)="transferModal(transferTemplate)">Transfer</button>
+		</div>
 		
-	</div>
-	<div *ngIf="member.offices && member.offices.length"><h1>Offices</h1>
-		<ul style="list-style-type: none;">
-			<li *ngFor="let office of member.offices">
+		<ul class="list-group">
+			<li class="list-group-item" *ngIf="member.fullName"><span>Full Name: </span><span>{{member.fullName}}</span></li>
+			<li class="list-group-item"><span *ngIf="!member.fullName">Name: </span><span *ngIf="member.fullName">Preferred Name:</span> <span>{{member.nickname}}</span></li>
+			<li class="list-group-item" *ngIf="member.email"><span>Email: </span> <a href="mailto:{{member.email}}"><span>{{member.email}}</span></a></li>
+			<li class="list-group-item" *ngIf="member.address"><span>Address: </span> <span>{{member.address}}</span></li>
+			<li class="list-group-item"><span>Membership Type: </span> <span>{{member.membershipType}}</span>
+			<button type="button" class="btn btn-primary" *ngIf="member.membershipType=='None' && selectedOffice?.roles && selectedOffice.roles.indexOf('user_approve') !== -1" (click)="confirmModal(approveConfirm)">Approve Membership</button>
+	
+			</li>
+			<li class="list-group-item" *ngIf="member.membershipNumber"><span>Membership #: </span> <span>{{member.membershipNumber}}</span></li>
+			<li class="list-group-item" *ngIf="member.membershipNumber"><span>Expiration: </span> <span>{{member.membershipExpiration}}</span></li>
+			<li class="list-group-item"><span>Location: </span>
+				<span *ngIf="!member.orgUnit">None</span>
+				<span *ngIf="member.orgUnit"><a [routerLink]="['/locations',member.orgUnit.id]">{{member.orgUnit.name}} ({{member.orgUnit.code}})</a></span>
+			</li>
+		</ul>
+	</div></div>
+	<ng-container *ngIf="member.id==hubService.currentUserId">
+		<div *ngIf="member.membershipType=='None'" class="alert alert-danger" role="alert">
+			<strong>You are not currently a member.</strong><br/>
+			Once you have attended a WPI Event, you can apply for membership (see website for exceptions).<br/>
+			<a href="https://windingpath.club/membership/" target="_blank">See website for information on applying for membership</a>
+		</div>
+		<div *ngIf="member.membershipType=='Pending'" class="alert alert-warning" role="alert">
+			<strong>Your membership application has been received and your membership is pending.</strong><br/>
+			You will be notified once your membership application has been reviewed.<br/>
+			<a href="https://windingpath.club/membership/" target="_blank">See website for information on applying for membership</a>
+		</div>
+		<div *ngIf="member.membershipType=='Suspended'" class="alert alert-warning" role="alert">
+			<strong>Your membership has been temporarily suspended</strong><br/>
+			<span>For information on your membership status, please contact 
+			<span *ngIf="member.orgUnit">the Chapter Owner for <a [routerLink]="['/locations',member.orgUnit.id]">your chapter</a>, or </span>the <a href="mailto:board@windingpath.club" target="_blank">Board of Directors</a></span>
+		</div>
+		<div *ngIf="member.membershipType=='Resigned' || member.membershipType=='Expelled' || member.membershipType=='Uninvited'" class="alert alert-danger" role="alert">
+			<strong *ngIf="member.membershipType=='Resigned'">You have resigned your membership.</strong>
+			<strong *ngIf="member.membershipType=='Expelled'">You have been expelled from WPI.</strong>
+			<strong *ngIf="member.membershipType=='Uninvited'">You have been uninvited from WPI.</strong>
+			<br/>
+			<span>For information on your membership status<span *ngIf="member.membershipType=='Resigned'">, or to ask for your membership to be reopened</span>, please contact the <a href="mailto:board@windingpath.club" target="_blank">Board of Directors</a></span>
+		</div>
+	</ng-container>
+	
+	<div class="card" *ngIf="member.offices && member.offices.length"><div class="card-body">
+		<h1 class="card-header">Offices</h1>
+		<ul class="list-group">
+			<li class="list-group-item" *ngFor="let office of member.offices">
 				<span>{{office.name}} ({{office.type}}), <a [routerLink]="['/locations',office.unit.id]">{{office.unit.name}} ({{office.unit.code}})</a></span>
 				<span *ngIf="office.email"><a href="mailto:{{office.email}}">{{office.email}}</a></span>
 			</li>
 		</ul>
-	</div>
+	</div></div>
 	<ng-template #transferTemplate>
 	<div class="modal-header">
 		<h4 class="modal-title pull-left">Transfer {{member.nickname}}</h4>

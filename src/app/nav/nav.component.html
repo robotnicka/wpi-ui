@@ -59,7 +59,7 @@
 		</div>
 		<div class="nav navbar-nav" *ngIf="user">
 			<div class="alert alert-danger" *ngIf="!hubUser">Unable to connect to User Hub!</div>
-			<span class="navbar-text text-white navbar__user-info" *ngIf="hubUser"><small>{{hubUser.fullName}}</small> <small *ngIf="hubUser.membershipType=='Full'">{{hubUser?.membershipNumber}}</small> <small *ngIf="hubUser.membershipType=='None'">(Not a member)</small></span>
+			<a *ngIf="hubUser" [routerLink]="['/members',hubUser.id]"><span class="navbar-text text-white navbar__user-info"><small>{{hubUser.fullName}}</small> <small *ngIf="hubUser.membershipType=='Full'">{{hubUser?.membershipNumber}}</small> <small *ngIf="hubUser.membershipType=='None'">(Not a member)</small></span></a>
 			  <!--This will work as long as the authService is injected into this component. -->
 			<button (click)="logout()" type="button" class="btn btn-outline-secondary btn-sm">Logout</button>
 		</div>

@@ -8,7 +8,7 @@ import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { HubService} from 'app/modules/core/hub.service';
 import { CognitoUtil } from "app/modules/core/cognito.service";
-import { Office, User, PasswordChange } from 'app/modules/core/models/';
+import { ApiErrorResponse, Office, User, PasswordChange } from 'app/modules/core/models/';
 
 
 @Component({
@@ -22,12 +22,14 @@ export class MemberComponent implements OnInit, OnDestroy {
 	confirmModalRef: BsModalRef;
 	editModalRef: BsModalRef;
 	member: User;
+	currentId: number = 0;
 	editModel: any;
 	passwordChangeModel: PasswordChange;
 	confirmPassword: string;
 	userOffices: Office[];
 	selectedOffice: Office;
 	isTransferring: boolean = false;
+	error: any;
 	constructor(public hubService: HubService,
 		@Inject('cognitoMain') private cognitoMain: CognitoUtil,
 		private route: ActivatedRoute,
@@ -43,13 +45,22 @@ export class MemberComponent implements OnInit, OnDestroy {
 		if(this.memberSubscription) this.memberSubscription.unsubscribe();
 		this.memberSubscription = this.route.params
 			.pipe(switchMap((params: Params) => {
+				this.currentId = params['id'];
+				console.log('user switchmap called');
+				this.error=null;
 				let getParams:any = {offices: 1, children: 1, private: 1};
 				if(refresh) getParams.refresh=1;
 				return this.hubService.getUser(params['id'], getParams);
 			})).subscribe(
-				(member) => {
-					this.member = member;
-					console.log('got member',this.member);
+				(response) => {
+					if(response instanceof ApiErrorResponse){
+						console.log('got error for member!', response);
+						this.error = response;
+					}
+					else{
+						this.member = response;
+						console.log('got member',this.member);
+					}
 				}
 			);
 	}
@@ -57,6 +68,7 @@ export class MemberComponent implements OnInit, OnDestroy {
 		if(this.officeSubscription) this.officeSubscription.unsubscribe();
 		this.officeSubscription = this.route.params
 			.pipe(switchMap((params: Params) => {
+				console.log('user offices switch map called');
 				return this.hubService.getUserAuthority(params['id']);
 			})).subscribe(
 				(offices:Office[]) => {
@@ -67,6 +79,9 @@ export class MemberComponent implements OnInit, OnDestroy {
 						this.selectedOffice = this.userOffices[0];
 					}
 					
+				},
+				(error) => {
+					console.log('got offices error', error);
 				}
 			);
 	}

@@ -21,7 +21,9 @@ export class LocationComponent implements OnInit, OnDestroy {
 	orgSubscription: Subscription;
 	officeSubscription: Subscription;
 	officerModalSubscription: Subscription;
+	currentId: number = 0;
 	orgUnit: OrgUnit;
+	parentOrgUnit: OrgUnit;
 	editOrgUnit: OrgUnit;
 	userOffices: Office[];
 	selectedOffice: Office;
@@ -66,10 +68,16 @@ export class LocationComponent implements OnInit, OnDestroy {
 		if(this.orgSubscription) this.orgSubscription.unsubscribe();
 		this.orgSubscription = this.route.params
 			.pipe(switchMap((params: Params) => {
+				this.currentId = params['id'];
+				this.parentOrgUnit = null;
 				return this.hubService.getOrgUnit(params['id'],false);
 			})).subscribe(
 				(orgUnit:OrgUnit) => {
 					this.orgUnit = orgUnit;
+					if(this.orgUnit.parents && this.orgUnit.parents.length){
+						this.parentOrgUnit = this.orgUnit.parents[this.orgUnit.parents.length-1];
+						console.log('parentOrgUnit', this.parentOrgUnit);
+					}
 					console.log('got location unit',this.orgUnit);
 				}
 			);

@@ -7,7 +7,7 @@ import 'rxjs/add/observable/of';
 
 import { environment } from 'environments/environment';
 import {CognitoUtil} from "app/modules/core/cognito.service";
-import { User, Office, OrgUnit, OrgUnitSearch, UserSearch } from './models/';
+import { ApiErrorResponse, User, Office, OrgUnit, OrgUnitSearch, UserSearch } from './models/';
 
 @Injectable()
 export class HubService {
@@ -78,7 +78,19 @@ export class HubService {
 						return Observable.of(null);
 					}
 					else{
-						return this.getUser('me',{offices: 1, children: 1}).map((user) => { this.currentUserId = user.id; return user;});
+						return this.getUser('me',{offices: 1, children: 1}).pipe(
+							map(
+								(user) => {
+									if(user instanceof ApiErrorResponse){
+										throw Error(user.message);
+									}
+									else{
+										this.currentUserId = user.id;
+										return user as User;
+									}
+								}
+							)
+						);
 					}
 				}
 			));
@@ -116,8 +128,23 @@ export class HubService {
 				.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;})));
 	}
 	
-	public getUser(id: any, options: any = {}):Observable<User>{
-		return this.checkIdToken().pipe(switchMap(() => this.http.get<User>(environment.hub.url+'user/'+id,{headers: this.headers, params: options})));
+	public getUser(id: any, options: any = {}):Observable<User|ApiErrorResponse>{
+		return this.checkIdToken().pipe(
+			switchMap(
+				() => {
+					return this.http.get<User>(environment.hub.url+'user/'+id,{headers: this.headers, params: options})
+					.catch((error: any) => {
+						let errorResponse = new ApiErrorResponse();
+						errorResponse.error=true;
+						if(error.error){
+							if(error.error.status) errorResponse.status = error.error.status;
+							if(error.error.message) errorResponse.message = error.error.message;
+						}
+						return Observable.of(errorResponse) as Observable<ApiErrorResponse>;
+					});
+				}
+			)
+		);
 	}
 	
 	public getUsers(search: UserSearch): Observable<User[]>{
@@ -149,7 +176,7 @@ export class HubService {
 	}
 	
 	public getOrgUnit(id: number, limited: boolean = false): Observable<OrgUnit>{
-		let searchParams = {users: '1', offices: '1', parents: '1', children: '-1'};
+		let searchParams = {users: '1', offices: '1', parents: '-1', children: '-1'};
 		if(limited){
 			searchParams.users='0';
 			searchParams.offices='0';

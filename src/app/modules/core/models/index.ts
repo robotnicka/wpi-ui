@@ -1,3 +1,4 @@
+export { ApiErrorResponse } from './api-error-response';
 export { Office } from './office';
 export { User } from './user';
 export { UserSearch } from './user-search';

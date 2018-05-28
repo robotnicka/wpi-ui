@@ -3,7 +3,7 @@
     margin-bottom: 10px;
     overflow:scroll;
     -webkit-overflow-scrolling: touch;">
-  <button type="button" class="list-group-item list-group-item-action" *ngFor="let member of users" [class.active]="member==selectedMember" [disabled]="member.membershipType!='Full'" (click)="selectMember(member)">
+  <button type="button" class="list-group-item list-group-item-action" style="padding:0px" *ngFor="let member of users" [class.active]="member==selectedMember" [disabled]="member.membershipType!='Full'" (click)="selectMember(member)">
   	{{member.nickname}}
   	<ng-container *ngIf="member.membershipNumber">({{member.membershipNumber}})</ng-container>
 	<ng-container *ngIf="!member.membershipNumber">(Non-Member)</ng-container> 
