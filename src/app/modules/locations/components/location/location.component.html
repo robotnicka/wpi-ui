@@ -32,7 +32,10 @@
 				<li class="list-group-item"><span>Website:</span> <span><a [href]="orgUnit.website" target="_blank">{{orgUnit.website}}</a></span></li>
 				<li class="list-group-item" *ngIf="parentOrgUnit"><span>Parent Location:</span> <span><a [routerLink]="['/locations',parentOrgUnit.id]">{{parentOrgUnit.name}} ({{parentOrgUnit.code}})</a></span></li>
 			</ul>
-			<p>{{orgUnit.defDoc}}</p>
+			<div class="card-body">
+				<p>{{orgUnit.defDoc}}</p>
+			</div>
+			
 		</div>
 		<div *ngIf="editing">
 			<label>Code:</label> <input type="text" [(ngModel)]="editOrgUnit.code"/><br/>

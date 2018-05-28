@@ -1,6 +1,8 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item" aria-current="page"><a routerLink="/members">Member Search</a></li>
+    <li class="breadcrumb-item" aria-current="page"><a routerLink="/members">Members</a></li>
+    <li class="breadcrumb-item" aria-current="page" *ngIf="member?.orgUnit"><a [routerLink]="['/locations',member.orgUnit.id]">{{member.orgUnit.name}} ({{member.orgUnit.code}})</a></li>
+
     <li class="breadcrumb-item active" aria-current="page"><span *ngIf="member?.nickname">{{member.nickname}}</span><span *ngIf="!member?.nickname">{{currentId}}</span></li>
   </ol>
 </nav>
