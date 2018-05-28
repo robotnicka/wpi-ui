@@ -19,7 +19,7 @@
 		
 	</div>
 </div>
-<ng-container *ngIf="member && !member.error">
+<ng-container *ngIf="member">
 	<div class="alert alert-info" role="alert" *ngIf="userOffices && userOffices.length">
 		<span>Viewing as office:</span>
 		<span *ngIf="userOffices.length==1 || editing">{{userOffices[0].name}}</span>
