@@ -10,12 +10,14 @@
   </ol>
 </nav>
 <ng-container *ngIf="orgUnit">
-	<div class="alert alert-info" *ngIf="userOffices && userOffices.length">
-		<span>Viewing as office:</span>
-		<span *ngIf="userOffices.length==1 || editing">{{userOffices[0].name}}</span>
-		<select *ngIf="userOffices.length>1 && !editing" [(ngModel)]="selectedOffice" (change)="officePermissions(selectedOffice)">
-			<option *ngFor="let officeOption of userOffices" [ngValue]="officeOption">{{officeOption.name}}</option>
-		</select>
+	<div class="alert alert-info row" *ngIf="userOffices && userOffices.length">
+		<div class="col-sm-3"><span>Viewing as office:</span></div>
+		<div class="col-sm-9">
+			<span *ngIf="userOffices.length==1 || editing">{{userOffices[0].name}}</span>
+			<select class="form-control" length=25 *ngIf="userOffices.length>1 && !editing" [(ngModel)]="selectedOffice" (change)="officePermissions(selectedOffice)">
+				<option *ngFor="let officeOption of userOffices" [ngValue]="officeOption">{{officeOption.name}}</option>
+			</select>
+		</div>
 	</div>
 	<div class="card"><div class="card-body">
 		<div class="card-header">

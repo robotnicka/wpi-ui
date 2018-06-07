@@ -8,6 +8,7 @@ import {CognitoUtil, CognitoResponse, LoginResponse} from "app/modules/core/cogn
 })
 export class LoginComponent implements OnInit {
 	@ViewChild('loginUsername') loginUsername: ElementRef;
+	returnUrl: string;
 	username: string;
 	password: string;
 	errorMessage: string;
@@ -15,11 +16,13 @@ export class LoginComponent implements OnInit {
 	notFoundEmail: boolean = false;
 	loggedIn: boolean = false;
 	public submitting: boolean = false;
-	constructor(public router: Router, @Inject('cognitoMain') private cognitoMain: CognitoUtil){
+	
+	constructor(private route: ActivatedRoute, public router: Router, @Inject('cognitoMain') private cognitoMain: CognitoUtil){
 		console.log("LoginComponent constructor");
 	}
 
 	ngOnInit() {
+		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 		this.errorMessage = null;
 		this.cognitoMain.isAuthenticated().subscribe(
 			(response:LoginResponse)=>{
@@ -68,7 +71,7 @@ export class LoginComponent implements OnInit {
 					}
 					this.submitting = false;
 				} else { //success
-					this.router.navigate(['/members']);
+					this.router.navigateByUrl(this.returnUrl);
 				}
 			}
 		);

@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/first';
@@ -10,7 +10,7 @@ import { CognitoUtil, LoginResponse } from './cognito.service';
 export class GuardService implements CanActivate {
 
 	constructor(@Inject('cognitoMain') private cognitoMain: CognitoUtil, private router: Router) { }
-	canActivate(): Observable<boolean> {
+	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
 		return this.cognitoMain.isAuthenticated().first().map(
 			(response:LoginResponse)=>{
 				console.log('map called!');
@@ -21,7 +21,7 @@ export class GuardService implements CanActivate {
 				}
 				else {
 					console.log('navigating to login!');
-					this.router.navigate(['/auth/login']);
+					this.router.navigate(['/auth/login'],{ queryParams: { returnUrl: state.url }});
 					console.log('returning false!');
 					return false;
 				}
