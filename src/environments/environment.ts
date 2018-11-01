@@ -15,6 +15,6 @@ export const environment = {
 		sts_endpoint: '',
 	},
 	hub: {
-		url: '/api/v1/'
+		url: '/api/hub/v1/'
 	}
 };
