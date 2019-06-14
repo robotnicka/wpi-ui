@@ -1,4 +1,5 @@
 import {Injectable} from "@angular/core";
+import { CookieService } from 'ngx-cookie-service';
 import {environment} from "../../../environments/environment";
 import {Subject} from 'rxjs/Subject';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
@@ -61,7 +62,6 @@ export class CognitoUtil {
 
 	public static _REGION = environment.cognito.region;
 
-	public static _IDENTITY_POOL_ID = environment.cognito.identityPoolId;
 	public static _USER_POOL_ID = environment.cognito.userPoolId;
 	public static _CLIENT_ID = environment.cognito.clientId;
 
@@ -74,7 +74,17 @@ export class CognitoUtil {
 	public registeredUser: CognitoUser = null;
 
 	private $loggedIn: BehaviorSubject<LoginResponse>;
-	constructor(private router: Router) {}
+	private currentIdToken: string = '';
+	
+	private setCookie: boolean = false;
+	private cookieDomain: string = '';
+	private cookieSecure: boolean = false;
+	
+	constructor(private router: Router, private cookieService: CookieService) {
+		if(environment.cognito.setCookie != null) this.setCookie = environment.cognito.setCookie;
+		if(environment.cognito.cookieDomain != null) this.cookieDomain = environment.cognito.cookieDomain;
+		if(environment.cognito.cookieSecure != null) this.cookieSecure = environment.cognito.cookieSecure;
+	}
 	
 	authenticate(username: string, password: string) {
 		let authenticateResult = new ReplaySubject<CognitoResponse>();
@@ -165,6 +175,9 @@ export class CognitoUtil {
 		console.log("UserLoginService: Logging out");
 		this.getCurrentUser().signOut();
 		this.$loggedIn.next(new LoginResponse("User logged out", false));
+		if(this.setCookie){
+			this.cookieService.delete('idToken','/',this.cookieDomain);
+		}
 		this.router.navigate(['/auth/login']);
 
 	}
@@ -255,7 +268,19 @@ export class CognitoUtil {
 			(userSession: CognitoUserSession|null)=>
 			{
 				if(userSession != null){
-					return userSession.getIdToken().getJwtToken();
+					let newIdToken = userSession.getIdToken();
+					let newIdTokenJwt = newIdToken.getJwtToken();
+					if(newIdTokenJwt != this.currentIdToken){
+						if(this.setCookie){
+							let tokenDate = new Date(newIdToken.getExpiration()*1000);
+							console.log('setting token', 'idToken',newIdTokenJwt,tokenDate,'/',this.cookieDomain,this.cookieSecure);
+							console.log('expiration', tokenDate.toUTCString());
+							this.cookieService.set('idToken',newIdTokenJwt,tokenDate,'/',this.cookieDomain,this.cookieSecure);
+							
+    					}
+						this.currentIdToken = newIdTokenJwt;
+					}
+					return newIdTokenJwt;
 				}else{
 					return null;
 				}

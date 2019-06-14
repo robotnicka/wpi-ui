@@ -71,7 +71,11 @@ export class LoginComponent implements OnInit {
 					}
 					this.submitting = false;
 				} else { //success
-					this.router.navigateByUrl(this.returnUrl);
+					if(this.returnUrl.substring(0,4) == 'http'){
+						window.location.href=this.returnUrl;
+					}else{
+						this.router.navigateByUrl(this.returnUrl);
+					}
 				}
 			}
 		);

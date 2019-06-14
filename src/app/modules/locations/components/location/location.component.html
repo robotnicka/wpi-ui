@@ -26,13 +26,13 @@
 		</div>
 		<div *ngIf="!editing">
 			<ul class="list-group">
-				<li class="list-group-item"><span>Code:</span> <span>{{orgUnit.code}}</span></li>
-				<li class="list-group-item"><span>Name:</span> <span>{{orgUnit.name}}</span></li>
-				<li class="list-group-item"><span>Location:</span> <span>{{orgUnit.location}}</span></li>
+				<li class="list-group-item"><span>Code: </span> <span>{{orgUnit.code}}</span></li>
+				<li class="list-group-item"><span>Name: </span> <span>{{orgUnit.name}}</span></li>
+				<li class="list-group-item"><span>Location: </span> <span>{{orgUnit.location}}</span></li>
 				<li class="list-group-item"><span>Type: </span><span>{{orgUnit.type}}</span></li>
 				<li class="list-group-item" *ngIf="orgUnit.venueType"><span>Venue Type: </span><span>{{orgUnit.venueType}}</span></li>
-				<li class="list-group-item"><span>Website:</span> <span><a [href]="orgUnit.website" target="_blank">{{orgUnit.website}}</a></span></li>
-				<li class="list-group-item" *ngIf="parentOrgUnit"><span>Parent Location:</span> <span><a [routerLink]="['/locations',parentOrgUnit.id]">{{parentOrgUnit.name}} ({{parentOrgUnit.code}})</a></span></li>
+				<li class="list-group-item"><span>Website: </span> <span><a [href]="orgUnit.website" target="_blank">{{orgUnit.website}}</a></span></li>
+				<li class="list-group-item" *ngIf="parentOrgUnit"><span>Parent Location: </span> <span><a [routerLink]="['/locations',parentOrgUnit.id]">{{parentOrgUnit.name}} ({{parentOrgUnit.code}})</a></span></li>
 			</ul>
 			<div class="card-body">
 				<p>{{orgUnit.defDoc}}</p>
@@ -57,7 +57,7 @@
 				<span>{{office.name}} ({{office.type}}):</span>
 				<span *ngIf="!office?.user?.membershipNumber">Vacant</span>
 				<span *ngIf="office?.user?.membershipNumber"><a [routerLink]="['/members',office.user.id]">{{office.user.nickname}} ({{office.user.membershipNumber}})</a></span>
-				<span *ngIf="office.email">Email: <a href="mailto:{{office.email}}">{{office.email}}</a></span>
+				<span *ngIf="office.email">Email: <a href="mailto:{{office.email}}">{{office.email}}</a> </span>
 				<button type="button" class="btn btn-primary" *ngIf="selectedOffice && (selectedOffice.roles.indexOf('office_update') != -1 || selectedOffice.roles.indexOf('office_assign') != -1)" (click)="officerModal(office)">View</button>
 			</li>
 		</ul>
