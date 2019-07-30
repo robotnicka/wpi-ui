@@ -12,6 +12,6 @@ export const environment = {
 		cookieSecure: true
 	},
 	hub: {
-		url: '/api/v1/'
+		url: 'https://hub.api.windingpath.club/v1/'
 	}
 };
