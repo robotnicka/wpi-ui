@@ -27,7 +27,7 @@ import{
 	 templateUrl: './nav.component.html',
  })
 export class NavComponent implements OnInit {
-	@ViewChild('scrollOutlet') scrollOutlet: ElementRef;
+	@ViewChild('scrollOutlet', { static: true }) scrollOutlet: ElementRef;
 	private lastPoppedUrl: string;
 	private yScrollStack: number[] = [];
 	public user: Object;

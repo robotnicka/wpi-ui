@@ -34,8 +34,8 @@ export class RegistrationAddressInfo {
 export class RegisterComponent implements OnInit {
 	registrationUser: RegistrationUser;
 	errorMessage: string;
-	@ViewChild('signupNameInput') signupName: ElementRef;
-	@ViewChild('formTop') formTop: ElementRef;
+	@ViewChild('signupNameInput', { static: true }) signupName: ElementRef;
+	@ViewChild('formTop', { static: true }) formTop: ElementRef;
 	public submitting: boolean = false;
 	constructor(@Inject('cognitoMain') private cognitoMain: CognitoUtil, private router: Router) {
 		this.registrationUser = new RegistrationUser();
