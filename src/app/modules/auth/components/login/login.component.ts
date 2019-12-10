@@ -7,7 +7,7 @@ import {CognitoUtil, CognitoResponse, LoginResponse} from "app/modules/core/cogn
   templateUrl: './login.component.html'
 })
 export class LoginComponent implements OnInit {
-	@ViewChild('loginUsername') loginUsername: ElementRef;
+	@ViewChild('loginUsername', { static: true }) loginUsername: ElementRef;
 	returnUrl: string;
 	username: string;
 	password: string;

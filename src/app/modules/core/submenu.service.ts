@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/Rx';
-import { Observable }     from 'rxjs/Observable';
+import { BehaviorSubject ,  Observable } from 'rxjs';
 import { SubmenuItem } from './submenu-item.model';
 
 @Injectable()

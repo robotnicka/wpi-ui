@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs/Rx';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { HubService} from 'app/modules/core/hub.service';
 import { OrgUnitSearch, OrgUnit} from 'app/modules/core/models/';

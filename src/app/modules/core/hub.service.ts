@@ -1,9 +1,10 @@
+
+import {of as observableOf, throwError as observableThrowError, Observable, BehaviorSubject} from 'rxjs';
+
+import {catchError,  map, switchMap, first } from 'rxjs/operators';
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import {Observable} from 'rxjs/Observable';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import { map, switchMap, first } from 'rxjs/operators';
-import 'rxjs/add/observable/of';
+
 
 import { environment } from 'environments/environment';
 import {CognitoUtil} from "app/modules/core/cognito.service";
@@ -42,8 +43,8 @@ export class HubService {
 	}
 	
 	checkIdToken(): Observable<string>{
-		return this.cognitoMain.getIdToken().first()
-			.map((idToken) => {
+		return this.cognitoMain.getIdToken().pipe(first(),
+			map((idToken) => {
 				if(idToken && idToken != this.idToken){
 					console.log('id token has changed');
 					console.log('old token', this.idToken);
@@ -51,7 +52,7 @@ export class HubService {
 					this.setIdToken(idToken);
 				}
 				return idToken;
-			});
+			}),);
 	}
 	
 	setIdToken(idToken: string){
@@ -75,7 +76,7 @@ export class HubService {
 				(idToken) => {
 					console.log('idToken currentUser Switchmap',idToken);
 					if(idToken == null){
-						return Observable.of(null);
+						return observableOf(null);
 					}
 					else{
 						return this.getUser('me',{offices: 1, children: 1}).pipe(
@@ -105,10 +106,10 @@ export class HubService {
 					return this.checkIdToken().pipe(switchMap(() => this.http.get(environment.hub.url+'office/verify/orgunit/'+id,
 						{headers: this.headers,
 							params:{roles:Object.keys(this.officeRoles).join(',')}})
-							.pipe(map((response:any) => response.offices))
-							.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;})));
+							.pipe(map((response:any) => response.offices)).pipe(
+							catchError((error:any) => { return observableOf([]) as Observable<Office[]>;}))));
 				}
-				else return Observable.of([]) as Observable<Office[]>;
+				else return observableOf([]) as Observable<Office[]>;
 			}
 		));
 	}
@@ -116,32 +117,32 @@ export class HubService {
 		return this.checkIdToken().pipe(switchMap(() => this.http.get(environment.hub.url+'office/verify/office/'+officeid,
 			{headers: this.headers,
 				params:{roles:Object.keys(this.officeRoles).join(',')}})
-				.pipe(map((response:any) => response.offices))
-				.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;})));
+				.pipe(map((response:any) => response.offices)).pipe(
+				catchError((error:any) => { return observableOf([]) as Observable<Office[]>;}))));
 	}
 	
 	getUserAuthority(userid: number){
 		return this.checkIdToken().pipe(switchMap(() => this.http.get(environment.hub.url+'office/verify/user/'+userid,
 			{headers: this.headers,
 				params:{roles:Object.keys(this.officeRoles).join(',')}})
-				.pipe(map((response:any) => response.offices))
-				.catch((error:any) => { return Observable.of([]) as Observable<Office[]>;})));
+				.pipe(map((response:any) => response.offices)).pipe(
+				catchError((error:any) => { return observableOf([]) as Observable<Office[]>;}))));
 	}
 	
 	public getUser(id: any, options: any = {}):Observable<User|ApiErrorResponse>{
 		return this.checkIdToken().pipe(
 			switchMap(
 				() => {
-					return this.http.get<User>(environment.hub.url+'user/'+id,{headers: this.headers, params: options})
-					.catch((error: any) => {
+					return this.http.get<User>(environment.hub.url+'user/'+id,{headers: this.headers, params: options}).pipe(
+					catchError((error: any) => {
 						let errorResponse = new ApiErrorResponse();
 						errorResponse.error=true;
 						if(error.error){
 							if(error.error.status) errorResponse.status = error.error.status;
 							if(error.error.message) errorResponse.message = error.error.message;
 						}
-						return Observable.of(errorResponse) as Observable<ApiErrorResponse>;
-					});
+						return observableOf(errorResponse) as Observable<ApiErrorResponse>;
+					}));
 				}
 			)
 		);
@@ -155,9 +156,9 @@ export class HubService {
 		console.log(searchParams);
 		console.log(searchParams.toString());
 		console.log(searchParams.toString().length);
-		return this.checkIdToken().pipe(switchMap(() => this.http.get<OrgUnit[]>(environment.hub.url+'user', 
-										{headers: this.headers, params: searchParams} )
-					.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error'))));
+		return this.checkIdToken().pipe(switchMap(() => this.http.get<User[]>(environment.hub.url+'user', 
+										{headers: this.headers, params: searchParams} ).pipe(
+					catchError((error:any) => observableThrowError(error.json().error || 'Unknown server error')))));
 	
 	}
 	
@@ -170,8 +171,8 @@ export class HubService {
 		console.log(searchParams.toString().length);
 		if(searchParams.toString().length==0) searchParams = searchParams.set('type','Nation');
 		return this.checkIdToken().pipe(switchMap(() => this.http.get<OrgUnit[]>(environment.hub.url+'org-unit', 
-										{headers: this.headers, params: searchParams} )
-					.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error'))));
+										{headers: this.headers, params: searchParams} ).pipe(
+					catchError((error:any) => observableThrowError(error.json().error || 'Unknown server error')))));
 	
 	}
 	
@@ -183,8 +184,8 @@ export class HubService {
 			searchParams.parents='0';
 		}
 		let endpointUrl = environment.hub.url+'org-unit/'+id;
-		return this.checkIdToken().pipe(switchMap(() => this.http.get<OrgUnit>(endpointUrl, {headers: this.headers, params: searchParams as any} )
-			.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error')))); 
+		return this.checkIdToken().pipe(switchMap(() => this.http.get<OrgUnit>(endpointUrl, {headers: this.headers, params: searchParams as any} ).pipe(
+			catchError((error:any) => observableThrowError(error.json().error || 'Unknown server error'))))); 
 	}
 	
 	public updateOrgUnit(orgUnit:OrgUnit,office:Office):Observable<OrgUnit>{
@@ -209,8 +210,8 @@ export class HubService {
 	}
 	
 	public getOffice(officeid: number): Observable<Office>{
-		return this.checkIdToken().pipe(switchMap(() => this.http.get<Office>(environment.hub.url+'office/'+officeid, {headers: this.headers} )
-			.catch((error:any) => Observable.throw(error.json().error || 'Unknown server error')))); 
+		return this.checkIdToken().pipe(switchMap(() => this.http.get<Office>(environment.hub.url+'office/'+officeid, {headers: this.headers} ).pipe(
+			catchError((error:any) => observableThrowError(error.json().error || 'Unknown server error'))))); 
 	}
 	
 	public assignOffice(officeid: number, userid: number,officer:Office): Observable<any>{

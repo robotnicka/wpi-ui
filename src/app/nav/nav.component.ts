@@ -1,3 +1,5 @@
+
+import {filter} from 'rxjs/operators';
 import { Inject, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { Location, PopStateEvent } from "@angular/common";
@@ -9,20 +11,23 @@ import { SubmenuItem } from 'app/modules/core/submenu-item.model';
 
 import {
 	Component,
-	OnInit,
+	OnInit
+} from '@angular/core';
+
+import{
 	trigger,
 	state,
 	style,
 	transition,
 	animate
-} from '@angular/core';
+} from '@angular/animations';
 
  @Component({
 	 selector: 'app-nav',
 	 templateUrl: './nav.component.html',
  })
 export class NavComponent implements OnInit {
-	@ViewChild('scrollOutlet') scrollOutlet: ElementRef;
+	@ViewChild('scrollOutlet', { static: true }) scrollOutlet: ElementRef;
 	private lastPoppedUrl: string;
 	private yScrollStack: number[] = [];
 	public user: Object;
@@ -70,8 +75,8 @@ export class NavComponent implements OnInit {
 			this.lastPoppedUrl = ev.url;
 		});
 		
-		this.router.events
-		.filter(event => event instanceof NavigationStart || event instanceof NavigationEnd)
+		this.router.events.pipe(
+		filter(event => event instanceof NavigationStart || event instanceof NavigationEnd))
 		.subscribe((ev: NavigationStart | NavigationEnd) => {
 			let scrollheight = 0;
 			const contentContainer = document.querySelector('.ng-sidebar__content');

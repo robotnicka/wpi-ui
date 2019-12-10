@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, TemplateRef, EventEmitter, Output } from '@angular/core';
 import { Office, OrgUnit, User} from 'app/modules/core/models/';
-import { Subscription } from 'rxjs/Rx';
+import { Subscription } from 'rxjs';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { ToastrService } from 'ngx-toastr';
