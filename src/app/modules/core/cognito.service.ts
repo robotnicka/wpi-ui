@@ -1,15 +1,13 @@
+
+import {first,  map, switchMap } from 'rxjs/operators';
 import {Injectable} from "@angular/core";
 import { CookieService } from 'ngx-cookie-service';
 import {environment} from "../../../environments/environment";
-import {Subject} from 'rxjs/Subject';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
-import {Observable} from 'rxjs/Observable';
-import { map, switchMap } from 'rxjs/operators';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/of';
+import {Subject, BehaviorSubject, ReplaySubject, Observable} from 'rxjs';
+
+
+
+
 
 import {RegistrationUser, RegistrationAddressInfo} from "app/modules/auth/components/register/register.component";
 
@@ -121,14 +119,14 @@ export class CognitoUtil {
 				authenticateResult.next(new CognitoResponse(err.message, null));
 			},
 		});
-		return authenticateResult.asObservable().first(); 
+		return authenticateResult.asObservable().pipe(first()); 
 	}
 
 	forgotPassword(username: string): Observable<CognitoResponse> {
 		let forgotResult = new ReplaySubject<CognitoResponse>();
 		if(!username){
 			forgotResult.next(new CognitoResponse('Username is required', null));
-			return forgotResult.asObservable().first();
+			return forgotResult.asObservable().pipe(first());
 		}
 		let userData = {
 			Username: username,
@@ -148,7 +146,7 @@ export class CognitoUtil {
 				forgotResult.next(new CognitoResponse(null, null));
 			}
 		});
-		return forgotResult.asObservable().first();
+		return forgotResult.asObservable().pipe(first());
 	}
 
 	confirmNewPassword(username: string, verificationCode: string, password: string) : Observable<CognitoResponse> {
@@ -168,7 +166,7 @@ export class CognitoUtil {
 				confirmResult.next(new CognitoResponse(err.message, null));
 			}
 		});
-		return confirmResult.asObservable().first();
+		return confirmResult.asObservable().pipe(first());
 	}
 
 	logout() {
@@ -245,7 +243,7 @@ export class CognitoUtil {
 				else{
 					sessionResult.next(null);
 				}
-				return sessionResult.asObservable().first();
+				return sessionResult.asObservable().pipe(first());
 			}
 		));
 	}
@@ -359,7 +357,7 @@ export class CognitoUtil {
 			}
 		});
 		
-		return confirmResult.asObservable().first();
+		return confirmResult.asObservable().pipe(first());
 	}
 	
 	isEmail(username: string) : boolean{
@@ -384,7 +382,7 @@ export class CognitoUtil {
 				resendResult.next(new CognitoResponse(null, result));
 			}
 		});
-		return resendResult.asObservable().first();
+		return resendResult.asObservable().pipe(first());
 	}
 
 	setAuthChallenge(challenge: CognitoPasswordChallenge){
@@ -436,7 +434,7 @@ export class CognitoUtil {
 				newPasswordResult.next(new CognitoResponse(err, null));
 			}
 		});
-		return newPasswordResult.asObservable().first(); 
+		return newPasswordResult.asObservable().pipe(first()); 
 	}
 	
 	getAttributes(): Observable<any>{
@@ -465,7 +463,7 @@ export class CognitoUtil {
 					attributesResult.next(attributes);
 				});
 		});
-		return attributesResult.asObservable().first();
+		return attributesResult.asObservable().pipe(first());
 	}
 	
 	updateAttributes(attributes){
@@ -497,7 +495,7 @@ export class CognitoUtil {
 					attributesResult.next(result);
 				});
 		});
-		return attributesResult.asObservable().first().pipe(switchMap(
+		return attributesResult.asObservable().pipe(first()).pipe(switchMap(
 			(result) => {
 				let refreshResult = new ReplaySubject<any>();
 				let currentUser = this.getCurrentUser();
@@ -514,7 +512,7 @@ export class CognitoUtil {
 							refreshResult.next(result);
 						});
 				});
-				return refreshResult.asObservable().first();
+				return refreshResult.asObservable().pipe(first());
 			}
 			
 		));
@@ -538,6 +536,6 @@ export class CognitoUtil {
 					passwordResult.next(result);
 				});
 			});
-		return passwordResult.asObservable().first();
+		return passwordResult.asObservable().pipe(first());
 	}
 }

@@ -1,6 +1,6 @@
 import {Component, OnInit, OnDestroy, Inject} from "@angular/core";
 import {Router} from "@angular/router";
-import {Subscription} from 'rxjs/Subscription';
+import {Subscription} from 'rxjs';
 import {CognitoUtil, CognitoResponse, LoginResponse, NewPasswordUser} from "app/modules/core/cognito.service";
 
 

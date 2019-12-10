@@ -25,7 +25,7 @@ export class LocationListItemComponent implements OnInit {
 	}
 	toggle(){
 		if(!this.fetchedOrgUnit){
-			this.hubService.getOrgUnit(this.orgUnit.id,true).first().subscribe(
+			this.hubService.getOrgUnit(this.orgUnit.id,true).pipe(first()).subscribe(
 				(orgUnit:OrgUnit) => { this.fetchedOrgUnit = orgUnit; this.children = orgUnit.children; console.log(this.children); this.expanded = true}
 			);
 		}else{

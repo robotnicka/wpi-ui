@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnDestroy, OnInit, Output, Input } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs/Rx';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {HubService} from "app/modules/core/hub.service";
 import { OrgUnit, UserSearch, User} from 'app/modules/core/models/';
