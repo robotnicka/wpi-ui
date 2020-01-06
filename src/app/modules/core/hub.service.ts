@@ -7,7 +7,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 
 import { environment } from 'environments/environment';
-import {CognitoUtil} from "app/modules/core/cognito.service";
+import { AuthService} from 'app/modules/core/auth.service';
 import { ApiErrorResponse, User, Office, OrgUnit, OrgUnitSearch, UserSearch } from './models/';
 
 @Injectable()
@@ -20,10 +20,11 @@ export class HubService {
 	public orgUnitTypes:string[] = [];
 	public venueTypes:any[] = [];
 	public officeRoles:Object = {};
-	constructor(private http: HttpClient, @Inject('cognitoMain') private cognitoMain: CognitoUtil) {
+	constructor(private http: HttpClient, private authService: AuthService) {
 		console.log("constructing hub service");
 		this.headers = new HttpHeaders({'Content-Type':  'application/json'});
-		this.cognitoMain.getIdToken().subscribe(
+		
+		this.authService.getIdTokenSilently$().subscribe(
 			(idToken: string)=>
 			{
 				this.setIdToken(idToken);
@@ -43,8 +44,9 @@ export class HubService {
 	}
 	
 	checkIdToken(): Observable<string>{
-		return this.cognitoMain.getIdToken().pipe(first(),
-			map((idToken) => {
+		
+		return this.authService.getIdTokenSilently$().pipe(first(),
+			map((idToken:string) => {
 				if(idToken && idToken != this.idToken){
 					console.log('id token has changed');
 					console.log('old token', this.idToken);
