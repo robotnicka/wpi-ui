@@ -30,7 +30,7 @@
 	<div class="card"><div class="card-body">
 		<div class="card-header">
 			<h1>{{member.nickname}}</h1>
-			<button type="button" class="btn btn-primary" *ngIf="member.id==hubService.currentUserId" (click)="editUserModal(editTemplate)">Edit</button>
+			<button type="button" class="btn btn-primary" *ngIf="(member.id==hubService.currentUserId) || selectedOffice?.roles && selectedOffice.roles.indexOf('user_update') !== -1" (click)="editUserModal(editTemplate)">Edit</button>
 			<button type="button" class="btn btn-primary" *ngIf="member.id==hubService.currentUserId" (click)="editPasswordModal(passwordTemplate)">Change Password</button>
 			<button type="button" class="btn btn-primary" *ngIf="selectedOffice?.roles && selectedOffice.roles.indexOf('user_assign') !== -1" (click)="transferModal(transferTemplate)">Transfer</button>
 		</div>
@@ -128,8 +128,8 @@
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-3 col-form-label" for="signupStreetAddress">Address</label>
-			<div class="col-sm-9"><input id="signupStreetAddress" type="text" maxlength="25" class="form-control"
-				   placeholder="at least 6 characters" length="40" [(ngModel)]="editModel.address"
+			<div class="col-sm-9"><input id="signupStreetAddress" type="text" maxlength="150" class="form-control"
+				   placeholder="at least 6 characters" length="150" [(ngModel)]="editModel.address"
 				   [ngModelOptions]="{standalone: true}"></div>
 		</div>
 		
@@ -143,7 +143,7 @@
 </ng-template>
 
 <ng-template #passwordTemplate>
-	<ng-container *ngIf="passwordChangeModel">
+	<ng-container>
 		<div class="modal-header">
 			<h4 class="modal-title pull-left">Reset Password</h4>
 			<button type="button" class="close pull-right" aria-label="Close" (click)="editModalRef.hide()">

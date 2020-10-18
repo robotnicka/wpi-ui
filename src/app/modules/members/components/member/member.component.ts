@@ -123,7 +123,12 @@ export class MemberComponent implements OnInit, OnDestroy {
 	editUserModal(template: TemplateRef<any>){
 		console.log('making edit modal');
 		console.log(this.member);
-		
+		this.editModel = {};
+		this.editModel.name = this.member.fullName;
+		this.editModel.nickname = this.member.nickname;
+		this.editModel.address = this.member.address;
+		console.log('editModel', this.editModel);
+		this.editModalRef = this.modalService.show(template);
 		/*this.authService.getUser$().subscribe(
 			(user) => {
 				console.log(user);
@@ -152,11 +157,14 @@ export class MemberComponent implements OnInit, OnDestroy {
 	}*/
 
 	editPasswordModal(template: TemplateRef<any>){
+		console.log('editing password');
 		this.editModalRef = this.modalService.show(template);
 	}
 	editUser(){
+		var useOffice = null;
+		if(this.selectedOffice) useOffice = this.selectedOffice
 		
-		/*this.cognitoMain.updateAttributes(this.editModel).subscribe(
+		this.hubService.updateUser(this.member,this.editModel,useOffice).subscribe(
 			data => {
 				this.toastr.success('Details Updated!');
 				this.getMember(true);
@@ -166,7 +174,7 @@ export class MemberComponent implements OnInit, OnDestroy {
 				this.toastr.error(err);
 			}
 			
-		)*/
+		)
 	}
 	
 	resetPassword(){
