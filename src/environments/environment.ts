@@ -16,6 +16,14 @@ export const environment = {
 		cookieDomain: '',
 		cookieSecure: false
 	},
+	auth0: {
+		domain: 'wpidev.auth0.com',
+		clientId: 'TgFNmfJKLYJcSPCFQCsN42UHejfJoy1i',
+		audience: "https://dev.joeterranova.net/api/hub/",
+		managementAudience: "https://wpidev.auth0.com/api/v2/",
+		metadataKey: "https://dev.joeterranova.netuser_metadata",
+		dbConnection: "Username-Password-Authentication"
+	},
 	hub: {
 		url: '/api/hub/v1/'
 	}

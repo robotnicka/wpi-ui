@@ -5,8 +5,10 @@ import { Subscription ,  Observable } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { environment } from 'environments/environment';
 import { HubService} from 'app/modules/core/hub.service';
-import { CognitoUtil } from "app/modules/core/cognito.service";
+import { AuthService} from 'app/modules/core/auth.service';
+
 import { ApiErrorResponse, Office, User, PasswordChange } from 'app/modules/core/models/';
 
 
@@ -29,8 +31,9 @@ export class MemberComponent implements OnInit, OnDestroy {
 	selectedOffice: Office;
 	isTransferring: boolean = false;
 	error: any;
+	managementToken: string;
 	constructor(public hubService: HubService,
-		@Inject('cognitoMain') private cognitoMain: CognitoUtil,
+		public authService : AuthService,
 		private route: ActivatedRoute,
 		private router: Router,
 		private toastr: ToastrService,
@@ -118,32 +121,50 @@ export class MemberComponent implements OnInit, OnDestroy {
 		);
 	}
 	editUserModal(template: TemplateRef<any>){
-		this.cognitoMain.getAttributes().subscribe(
-			(attributes:any) =>
-			{
+		console.log('making edit modal');
+		console.log(this.member);
+		this.editModel = {};
+		this.editModel.name = this.member.fullName;
+		this.editModel.nickname = this.member.nickname;
+		this.editModel.address = this.member.address;
+		console.log('editModel', this.editModel);
+		this.editModalRef = this.modalService.show(template);
+		/*this.authService.getUser$().subscribe(
+			(user) => {
+				console.log(user);
+				let metakey = environment.auth0.metadataKey;
 				this.editModel = {};
-				this.editModel.name = attributes.name;
-				this.editModel.nickname = attributes.nickname;
-				this.editModel.birthdate = attributes.birthdate;
-				this.editModel.addressInfo = attributes.parsedAddress;
-
+				if(user[metakey]){
+					this.editModel.name = user[metakey].full_name;
+					this.editModel.nickname = user[metakey].preferred_name;
+					this.editModel.address = user[metakey].address;
+				}
 				console.log('editModel', this.editModel);
 				this.editModalRef = this.modalService.show(template);
 			}
-		)
+		);*/
+		
 	}
 	
+	/*getManagementToken(){
+		this.authService.getManagementToken$().subscribe(
+			(managementToken) => {
+				console.log('got management token');
+				console.log(managementToken);
+				this.managementToken = managementToken;
+			}
+		)
+	}*/
+
 	editPasswordModal(template: TemplateRef<any>){
-		this.passwordChangeModel = new PasswordChange();
-		this.confirmPassword = '';
+		console.log('editing password');
 		this.editModalRef = this.modalService.show(template);
-		
-		setTimeout(() => {
-			document.getElementById('editCurrentPassword').focus();
-		}, 500);
 	}
 	editUser(){
-		this.cognitoMain.updateAttributes(this.editModel).subscribe(
+		var useOffice = null;
+		if(this.selectedOffice) useOffice = this.selectedOffice
+		
+		this.hubService.updateUser(this.member,this.editModel,useOffice).subscribe(
 			data => {
 				this.toastr.success('Details Updated!');
 				this.getMember(true);
@@ -156,18 +177,16 @@ export class MemberComponent implements OnInit, OnDestroy {
 		)
 	}
 	
-	editPassword(){
-		this.cognitoMain.updatePassword(this.passwordChangeModel.oldPassword, this.passwordChangeModel.newPassword).subscribe(
-			data => {
-				this.toastr.success('Password Updated!');
-				this.getMember(true);
+	resetPassword(){
+		this.authService.resetPassword().subscribe(
+			(response) => {console.log('got reset password response', response);
+				this.toastr.success(response);
 				this.editModalRef.hide();
 			},
 			err => {
 				this.toastr.error(err.message);
 			}
-			
-		)
+		);
 	}
 	ngOnDestroy(){
 		this.memberSubscription.unsubscribe();
