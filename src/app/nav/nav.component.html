@@ -15,10 +15,10 @@
 					<h5 class="text-center">{{hubUser.fullName}}</h5>
 				</div>
 				<div>
-					<h5 *ngIf="hubUser.membershipType=='Full'" class="text-center">{{hubUser.membershipNumber}}</h5>
-					<h5 *ngIf="hubUser.membershipType=='None'" class="text-center">(Not a member)</h5>
+					<p *ngIf="hubUser.membershipType=='Full'" class="text-center">{{hubUser.membershipNumber}}</p>
+					<p *ngIf="hubUser.membershipType=='None'" class="text-center">(Not a member)</p>
 					<a [routerLink]="['/members',hubUser.id]" (click)="onNavClick()">
-						<h5 class="text-center">View Profile</h5>
+						<p class="text-center">View Profile</p>
 					</a>
 				</div>
 			</ng-container>
