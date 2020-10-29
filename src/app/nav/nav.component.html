@@ -65,7 +65,7 @@
 		</div>
 	</ng-sidebar>
 	<div ng-sidebar-content>
-		<nav class="navbar navbar--main fixed-top navbar-toggleable-sm navbar-dark bg-inverse" role="navigation">
+		<nav class="navbar navbar--main fixed-top navbar-toggleable-sm navbar-dark bg-dark" role="navigation">
 			<div class="container">
 				<div class="mr-auto">
 					<button class="navbar-toggle collapsed" (click)="onNavClick()">
@@ -81,17 +81,17 @@
 					</a>
 
 				</div>
-				<div class="nav navbar-nav" *ngIf="authService.loggedIn && hubUser">
+				<div *ngIf="authService.loggedIn && hubUser">
 					<div class="alert alert-danger" *ngIf="!hubUser">Unable to connect to User Hub!</div>
 					<a *ngIf="authService.loggedIn && hubUser" [routerLink]="['/members',hubUser.id]"><span
-							class="navbar-text text-white navbar__user-info"><small>{{hubUser.fullName}}</small>
+							class="navbar-text text-white navbar__user-info"><small><strong>{{hubUser.fullName}}</strong></small>
 							<small *ngIf="hubUser.membershipType=='Full'"> {{hubUser?.membershipNumber}}</small>
 							<small *ngIf="hubUser.membershipType=='None'">(Not a member)</small></span></a>
 					<!--This will work as long as the authService is injected into this component. -->
 					<button (click)="authService.logout();" type="button"
 						class="btn btn-outline-secondary btn-sm">Logout</button>
 				</div>
-				<div class="nav navbar-nav" *ngIf="!authService.loggedIn || !hubUser">
+				<div *ngIf="!authService.loggedIn || !hubUser">
 					<button (click)="authService.login();" type="button" class="btn btn-outline-secondary btn-sm">Log
 						In/Register</button>
 				</div>
