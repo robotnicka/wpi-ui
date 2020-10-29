@@ -14,7 +14,7 @@
 			automatically be associated to your account.</p>
 	</div>
 	<div *ngIf="hubUser">
-		<p>Hello, {{hubUser.nickname}}!</p>
+		<p class="lead">Hello, {{hubUser.nickname}}!</p>
 
 		<p
 			*ngIf="hubUser.membershipType=='Full' || hubUser.membershipType=='None' || hubUser.membershipType=='Pending' || hubUser.membershipType=='Suspended'">
