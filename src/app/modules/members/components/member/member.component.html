@@ -12,7 +12,7 @@
 </nav>
 
 <div *ngIf="error" class="alert alert-danger" role="alert">
-	<span>Unable to fetch member information</span>
+	<span>Unable to fetch member information.</span>
 	<div *ngIf="error.status">
 		<span *ngIf="error.status==403">
 			Your user does not have permission to view member information:
@@ -20,6 +20,7 @@
 			<span *ngIf="error.message=='User is not a member'">You are not currently a member.</span>
 			<br /><a [routerLink]="['/members',hubService.currentUserId]">View your profile to check your membership
 				status.</a>
+
 		</span>
 
 	</div>
@@ -47,14 +48,12 @@
 			</div>
 
 
-			<table class="table">
-
-				<tr *ngIf="member.fullName">
-					<th>Full Name:
-					</th>
-					<td>{{member.fullName}}</td>
-					</li>
-				</tr>
+			<ul lass="list-group list-group-flush">
+				<li class="list-group-item" *ngIf="member.fullName">
+					<span>Full Name:
+					</span>
+					<span>{{member.fullName}}</span>
+				</li>
 				<li class="list-group-item"><span *ngIf="!member.fullName">Name: </span><span
 						*ngIf="member.fullName">Preferred Name:</span> <span>{{member.nickname}}</span></li>
 				<li class="list-group-item" *ngIf="member.email"><span>Email: </span> <a
@@ -77,8 +76,7 @@
 							[routerLink]="['/locations',member.orgUnit.id]">{{member.orgUnit.name}}
 							({{member.orgUnit.code}})</a></span>
 				</li>
-
-			</table>
+			</ul>
 		</div>
 	</div>
 	<ng-container *ngIf="member.id==hubService.currentUserId">
