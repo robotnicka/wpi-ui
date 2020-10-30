@@ -10,6 +10,7 @@
 				*ngIf="!orgUnit?.name">{{currentId}}</span></li>
 	</ol>
 </nav>
+
 <ng-container *ngIf="orgUnit">
 	<div class="alert alert-info" *ngIf="userOffices && userOffices.length">
 		<div class="row">
@@ -24,6 +25,7 @@
 			</div>
 		</div>
 	</div>
+
 	<div class="card mb-3">
 		<div class="card-header d-flex justify-content-between">
 			<h3>Location: {{orgUnit.name}}</h3>
@@ -119,7 +121,9 @@
 				</ul>
 			</div>
 		</div>
+	</div>
 </ng-container>
+
 <ng-template #addTemplate>
 	<ng-container *ngIf="orgModel">
 		<div class="modal-header">
