@@ -1,48 +1,32 @@
 import {Component, OnInit, Inject, ViewChild, ElementRef} from "@angular/core";
 import {Router,ActivatedRoute} from "@angular/router";
-import {CognitoUtil, CognitoResponse, LoginResponse} from "app/modules/core/cognito.service";
+import { AuthService} from 'app/modules/core/auth.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html'
 })
 export class LoginComponent implements OnInit {
-	@ViewChild('loginUsername', { static: true }) loginUsername: ElementRef;
 	returnUrl: string;
 	username: string;
-	password: string;
 	errorMessage: string;
 	needConfirm: boolean = false;
 	notFoundEmail: boolean = false;
 	loggedIn: boolean = false;
 	public submitting: boolean = false;
 	
-	constructor(private route: ActivatedRoute, public router: Router, @Inject('cognitoMain') private cognitoMain: CognitoUtil){
+	constructor(private route: ActivatedRoute, public router: Router, private authService: AuthService){
 		console.log("LoginComponent constructor");
 	}
 
 	ngOnInit() {
 		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 		this.errorMessage = null;
-		this.cognitoMain.isAuthenticated().subscribe(
-			(response:LoginResponse)=>{
-				console.log('login page init');
-				console.log('loggedIn?',response.loggedIn);
-				if(response.loggedIn){
-					this.loggedIn = true;
-				}
-				else {
-					this.loggedIn = false;
-				}
-			}	
-		);
-		setTimeout(() => {
-			this.loginUsername.nativeElement.focus();
-		}, 1);
+		this.authService.login(this.returnUrl);
 		
 	}
 
-	onLogin() {
+	/*onLogin() {
 		this.needConfirm = false;
 		this.notFoundEmail = false;
 		
@@ -79,7 +63,7 @@ export class LoginComponent implements OnInit {
 				}
 			}
 		);
-	}
+	}*/
 
 
 }

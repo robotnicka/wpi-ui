@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SidebarModule } from 'ng-sidebar';
+import { AuthService } from './auth.service';
 import { CognitoUtil } from './cognito.service';
 import { GuardService } from './guard.service';
 import { HubService } from './hub.service';
@@ -20,6 +21,7 @@ import { TitleService } from './title.service';
 	declarations: [],
 	providers: [
 		{ provide: 'cognitoMain', useClass: CognitoUtil },
+		AuthService,
 		GuardService,
 		HubService,
 		SubmenuService,
