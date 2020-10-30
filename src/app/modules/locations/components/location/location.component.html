@@ -50,18 +50,20 @@
 			</div>
 		</div>
 		<div *ngIf="editing">
-			<label>Code:</label> <input type="text" [(ngModel)]="editOrgUnit.code" /><br />
-			<label>Name:</label> <input type="text" [(ngModel)]="editOrgUnit.name" /><br />
-			<label>Location:</label> <input type="text" [(ngModel)]="editOrgUnit.location" /><br />
-			<label>Website:</label> <input type="text" [(ngModel)]="editOrgUnit.website" /><br />
-			<label>Description</label> <textarea [(ngModel)]="editOrgUnit.defDoc"></textarea><br />
-			<button type="button" class="btn btn-primary" (click)="saveOrg()">Save</button>
-			<button type="button" class="btn btn-secondary" (click)="cancelOrg()">Cancel</button>
+			<div class="form-group">
+				<div class="form-group"><label>Code:</label> <input type="text" [(ngModel)]="editOrgUnit.code" /></div>
+				<div class="form-group"><label>Name:</label> <input type="text" [(ngModel)]="editOrgUnit.name" /></div>
+				<div class="form-group"><label>Location:</label> <input type="text"
+						[(ngModel)]="editOrgUnit.location" /></div>
+				<div class="form-group"><label>Website:</label> <input type="text" [(ngModel)]="editOrgUnit.website" />
+				</div>
+				<div class="form-group"><label>Description</label> <textarea
+						[(ngModel)]="editOrgUnit.defDoc"></textarea></div>
+				<button type="button" class="btn btn-primary" (click)="saveOrg()">Save</button>
+				<button type="button" class="btn btn-secondary" (click)="cancelOrg()">Cancel</button>
+			</div>
 		</div>
-
-	</div>
-	<div class="card mb-3">
-		<div class="card-body">
+		<div class="card mb-3">
 			<div class="card-header">
 				<h3>Officers</h3>
 			</div>
@@ -80,44 +82,43 @@
 				</li>
 			</ul>
 		</div>
-	</div>
-	<div class="card mb-3" *ngIf="orgUnit.type!='Venue'">
-		<div class="card-body">
-			<div class="card-header d-flex justify-content-between">
-				<h3>Locations in {{orgUnit.name}}</h3>
-				<button type="button" class="btn btn-link" *ngFor="let addOrgType of canAddOrgs"
-					(click)="addOrgModal(addTemplate,addOrgType)">Add {{addOrgType}}</button>
-			</div>
-			<span *ngIf="!orgUnit.children || orgUnit.children.length == 0">None!</span>
-			<ul class="list-group" *ngIf="orgUnit.children?.length">
-				<li class="list-group-item" *ngFor="let childUnit of orgUnit.children">
-					<span><a [routerLink]="['/locations',childUnit.id]">{{childUnit.name}}
-							({{childUnit.code}})</a></span>
-				</li>
-			</ul>
+		<div class="card mb-3" *ngIf="orgUnit.type!='Venue'">
+			<div class="card-body">
+				<div class="card-header d-flex justify-content-between">
+					<h3>Locations in {{orgUnit.name}}</h3>
+					<button type="button" class="btn btn-link" *ngFor="let addOrgType of canAddOrgs"
+						(click)="addOrgModal(addTemplate,addOrgType)">Add {{addOrgType}}</button>
+				</div>
+				<span *ngIf="!orgUnit.children || orgUnit.children.length == 0">None!</span>
+				<ul class="list-group" *ngIf="orgUnit.children?.length">
+					<li class="list-group-item" *ngFor="let childUnit of orgUnit.children">
+						<span><a [routerLink]="['/locations',childUnit.id]">{{childUnit.name}}
+								({{childUnit.code}})</a></span>
+					</li>
+				</ul>
 
-		</div>
-	</div>
-	<div class="card mb-3" *ngIf="orgUnit.type!='Venue'">
-		<div class="card-body">
-			<div class="card-header d-flex justify-content-between">
-				<h3>Members</h3>
-				<button type="button" class="btn btn-link"
-					*ngIf="!editing && orgUnit.type!='Venue' && selectedOffice?.roles && selectedOffice.roles.indexOf('user_add') !== -1"
-					(click)="addUserModal(addUserTemplate)">Manually Add Member</button>
 			</div>
-			<span *ngIf="!orgUnit.users || orgUnit.users.length == 0">None!</span>
-			<ul class="list-group" *ngIf="orgUnit.users.length">
-				<li class="list-group-item" *ngFor="let member of orgUnit.users">
-					<span><a [routerLink]="['/members',member.id]">{{member.nickname}}
-							({{member.membershipNumber}})</a></span>
-					<button type="button" class="btn btn-outline-primary float-right"
-						*ngIf="selectedOffice && canTransferMember"
-						(click)="transferModal(transferTemplate, member)">Transfer</button>
-				</li>
-			</ul>
 		</div>
-	</div>
+		<div class="card mb-3" *ngIf="orgUnit.type!='Venue'">
+			<div class="card-body">
+				<div class="card-header d-flex justify-content-between">
+					<h3>Members</h3>
+					<button type="button" class="btn btn-link"
+						*ngIf="!editing && orgUnit.type!='Venue' && selectedOffice?.roles && selectedOffice.roles.indexOf('user_add') !== -1"
+						(click)="addUserModal(addUserTemplate)">Manually Add Member</button>
+				</div>
+				<span *ngIf="!orgUnit.users || orgUnit.users.length == 0">None!</span>
+				<ul class="list-group" *ngIf="orgUnit.users.length">
+					<li class="list-group-item" *ngFor="let member of orgUnit.users">
+						<span><a [routerLink]="['/members',member.id]">{{member.nickname}}
+								({{member.membershipNumber}})</a></span>
+						<button type="button" class="btn btn-outline-primary float-right"
+							*ngIf="selectedOffice && canTransferMember"
+							(click)="transferModal(transferTemplate, member)">Transfer</button>
+					</li>
+				</ul>
+			</div>
+		</div>
 </ng-container>
 <ng-template #addTemplate>
 	<ng-container *ngIf="orgModel">
