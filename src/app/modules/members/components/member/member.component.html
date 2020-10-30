@@ -32,7 +32,7 @@
 			<option *ngFor="let officeOption of userOffices" [ngValue]="officeOption">{{officeOption.name}}</option>
 		</select>
 	</div>
-	<div class="card">
+	<div class="card mb-3">
 		<div class="card-body">
 			<div class="card-header">
 				<h3>{{member.nickname}}</h3>
@@ -46,9 +46,15 @@
 					(click)="transferModal(transferTemplate)">Transfer</button>
 			</div>
 
-			<ul class="list-group">
-				<li class="list-group-item" *ngIf="member.fullName"><span>Full Name:
-					</span><span>{{member.fullName}}</span></li>
+
+			<table class="table">
+
+				<tr *ngIf="member.fullName">
+					<th>Full Name:
+					</th>
+					<td>{{member.fullName}}</td>
+					</li>
+				</tr>
 				<li class="list-group-item"><span *ngIf="!member.fullName">Name: </span><span
 						*ngIf="member.fullName">Preferred Name:</span> <span>{{member.nickname}}</span></li>
 				<li class="list-group-item" *ngIf="member.email"><span>Email: </span> <a
@@ -71,7 +77,8 @@
 							[routerLink]="['/locations',member.orgUnit.id]">{{member.orgUnit.name}}
 							({{member.orgUnit.code}})</a></span>
 				</li>
-			</ul>
+
+			</table>
 		</div>
 	</div>
 	<ng-container *ngIf="member.id==hubService.currentUserId">
@@ -106,7 +113,7 @@
 		</div>
 	</ng-container>
 
-	<div class="card" *ngIf="member.offices && member.offices.length">
+	<div class="card mb-3" *ngIf="member.offices && member.offices.length">
 		<div class="card-body">
 			<h3 class="card-header">Offices</h3>
 			<ul class="list-group">
